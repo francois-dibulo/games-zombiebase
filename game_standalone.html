@@ -2,6 +2,48 @@
   This file simply mocks the airconsole environment so that building the game is faster
   and can be done without AirConsole or Angular.
   It should basically include the same code as js/app/screen/controllers/games.js
+
+  TODO:
+    * Unit can move into a vehicle (tower)
+    * Unit can pickup/drop things or exchange things (bring ammo to a tower, place mine)
+    * Enemies spawn and attack (buildings, towers)
+    * Items (energy, ammo, health, mines, bails) boxes spawn
+    * Different unit classes (engineer, pilot, medic, soldier)
+    * DoorClass which opens / closes
+    * Game Countdown
+    * HeliClass (arrives after x minutes, only pilot can fly it)
+    * Unit turns into enemy when x seconds dead
+    * Resize game
+
+    NICE TO HAVE
+      * TankClass
+      * Main goal of a player may change: "Kill Guest 3"
+      * Character modifications (more max ammo, faster, better weapon, more lives) -> After each round?
+      * Place invisible tiles for zombies (occupy door)
+
+    PILOT:
+      - Only one who can fly
+      - Max Ammo: 15 | Medium Range | High FQ
+      - Max Health: 1
+      - Speed: medium
+
+    ENGINEER:
+      - Can repair. Can place new towers?
+      - Max Ammo: 15 | Medium Range | Medium FQ
+      - Max Health: 5
+      - Speed: slow
+
+    MEDIC:
+      - Can heal / revive players
+      - Max Ammo: 5 | Low Range | Medium FQ
+      - Max Health: 10
+      - Speed: fast
+
+    SOLDIER:
+      - Increases Tower weapons, can drive tanks
+      - Max Ammo: 30 | High Range | LOW FQ
+      - Max Health: 5
+      - Speed: medium
  -->
 <!DOCTYPE HTML>
 <html>
@@ -14,7 +56,7 @@
     body {
       margin: 0;
       padding: 0;
-      background: #FFFFFF;
+      background: #333333;
     }
     #input-container {
       position: absolute;
@@ -41,15 +83,18 @@
   <!-- Game specific -->
   <script type="text/javascript" src="js/game/phaser_game.js"></script>
   <script type="text/javascript" src="js/game/models/unit.js"></script>
+  <script type="text/javascript" src="js/game/models/tower.js"></script>
+  <script type="text/javascript" src="js/game/models/helicopter_landing.js"></script>
   <script type="text/javascript">
     var airconsole = new AirConsole();
     var input_element = document.getElementById('input-container');
 
     // Create example team and players
     var player_1 = {
-      name: "Guest 1",
+      name: "Zeus",
       color: "#37b2ff",
       device_id: 1,
+      current_view: null,
       stats: {},
       move: {
         left: false,
@@ -60,7 +105,12 @@
       name: "Guest 2",
       color: "#afff37",
       device_id: 2,
-      stats: {}
+      current_view: null,
+      stats: {},
+      move: {
+        left: false,
+        right: false
+      }
     };
 
     var teams = [
@@ -77,48 +127,72 @@
 
     var KEY_LEFT = 37;
     var KEY_RIGHT = 39;
+    var KEY_UP = 38;
+    var KEY_A = 65;
+    var KEY_D = 68;
+    var KEY_W = 87;
 
     function sendMoveEvent() {
       PhaserGame.onPlayerInput(player_1, {
         action: 'move',
         data: player_1.move
       });
+      PhaserGame.onPlayerInput(player_2, {
+        action: 'move',
+        data: player_2.move
+      });
     }
 
     function onKeyDownEvent(e) {
       var key_code = e.keyCode;
+      //console.log(key_code);
+      var is_move_evt = false;
       if (KEY_LEFT === key_code) {
         player_1.move.left = true;
+        is_move_evt = true;
       } else if (KEY_RIGHT === key_code) {
         player_1.move.right = true;
+        is_move_evt = true;
+      } else if (KEY_A === key_code) {
+        player_2.move.left = true;
+        is_move_evt = true;
+      } else if (KEY_D === key_code) {
+        player_2.move.right = true;
+        is_move_evt = true;
+      // SHOOT
+      } else if (KEY_UP === key_code) {
+        PhaserGame.onPlayerInput(player_1, {
+          action: 'shoot'
+        });
       }
-      sendMoveEvent();
+      if (is_move_evt) {
+        sendMoveEvent();
+      }
     }
 
     function onKeyUpEvent(e) {
       var key_code = e.keyCode;
+      var is_move_evt = false;
       if (KEY_LEFT === key_code) {
         player_1.move.left = false;
+        is_move_evt = true;
       } else if (KEY_RIGHT === key_code) {
         player_1.move.right = false;
+        is_move_evt = true;
+      } else if (KEY_A === key_code) {
+        player_2.move.left = false;
+        is_move_evt = true;
+      } else if (KEY_D === key_code) {
+        player_2.move.right = false;
+        is_move_evt = true;
       }
-      sendMoveEvent();
+      if (is_move_evt) {
+        sendMoveEvent();
+      }
     }
 
     document.addEventListener("keydown", onKeyDownEvent, false);
     document.addEventListener("keyup", onKeyUpEvent, false);
-
-    // input_element.addEventListener('mousedown', function() {
-    //   PhaserGame.onPlayerInput(player_1, {
-    //     action: 'jump'
-    //   });
-    // }, true);
-
-    // input_element.addEventListener('mouseup', function() {
-    //   PhaserGame.onPlayerInput(player_1, {
-    //     action: 'fall'
-    //   });
-    // });
   </script>
 </body>
 </html>

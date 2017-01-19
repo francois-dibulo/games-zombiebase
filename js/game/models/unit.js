@@ -34,6 +34,17 @@ Unit = function (index, game, opts) {
 
   var style = { font: "10px Courier", fill: color };
   this.text1 = game.add.text(0, 0, opts.label || "Player", style);
+
+  this.setHealth(3);
+
+  // Creates 30 bullets, using the 'bullet' graphic
+  this.weapon = game.add.weapon(30, 'bullet');
+  this.weapon.bulletKillType = Phaser.Weapon.KILL_DISTANCE;
+  this.weapon.bulletKillDistance = 150;
+  this.weapon.fireLimit = 15;
+  this.weapon.fireRate = 300;
+  this.weapon.trackSprite(this, 0, 0, true);
+  this.weapon.onFireLimit.add(this.onFireLimit.bind(this));
 };
 
 Unit.prototype = Object.create(Phaser.Sprite.prototype);
@@ -42,6 +53,15 @@ Unit.prototype.constructor = Unit;
 Unit.prototype.update = function() {
   this.text1.alignTo(this, Phaser.CENTER_TOP, 16);
   this.game.physics.arcade.velocityFromAngle(this.angle, this.move_velocity, this.body.velocity);
+};
+
+Unit.prototype.onFireLimit = function() {
+  console.log("OUT OF AMMO");
+};
+
+Unit.prototype.onBulletHit = function() {
+  this.damage(1);
+  console.log("HIT", this.health);
 };
 
 Unit.prototype.onMove = function(data) {
@@ -55,7 +75,9 @@ Unit.prototype.onMove = function(data) {
     this.body.angularVelocity = -this.angular_move_velocity;
   } else if (data.right) {
     this.body.angularVelocity = this.angular_move_velocity;
-  } else {
-
   }
+};
+
+Unit.prototype.onShoot = function(data) {
+  this.weapon.fire();
 };
