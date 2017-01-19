@@ -92,14 +92,22 @@ var PhaserGame = {
   },
 
   update: function () {
+    var self = this;
     if (this.objects['unit']) {
       this.phaser.physics.arcade.collide(this.objects['unit'], this.layer);
       this.phaser.physics.arcade.collide(this.objects['unit'], this.objects['unit']);
       this.phaser.physics.arcade.collide(this.objects['unit'], this.enemies_group);
-      this.phaser.physics.arcade.collide(this.objects['unit'], this.towers_group, function() {
+      this.phaser.physics.arcade.collide(this.objects['unit'], this.towers_group, function(unit, tower) {
+
+        //console.log()
+        var player = self.getPlayerByDeviceId(unit.device_id);
+        player.unit = tower;
+        unit.visible = false;
+
       });
 
       this.phaser.physics.arcade.overlap(this.objects['unit'], this.helicopter_landings, function() {
+
       });
 
       // Bullets
@@ -128,6 +136,19 @@ var PhaserGame = {
   // =====================================================================================
   // PLAYERS
   // =====================================================================================
+  getPlayerByDeviceId: function(device_id) {
+    var player = null;
+    for (var i = 0; i < this.teams.length; i++) {
+      var players = this.teams[i].players;
+      for (var p = 0; p < players.length; p++) {
+        if (players[p].device_id === device_id) {
+          player = players[p];
+          break;
+        }
+      }
+    }
+    return player;
+  },
 
   buildPlayers: function() {
     var teams = this.teams;
@@ -138,9 +159,10 @@ var PhaserGame = {
       for (var p = 0; p < players.length; p++) {
         var player = players[p];
         var opts = {
+          device_id: player.device_id,
           color: player.color,
           label: player.name,
-          x: start_base.x + 8 * p,
+          x: start_base.x + 16 * p,
           y: start_base.y
         };
         var unit = new Unit(p, this.phaser, opts);

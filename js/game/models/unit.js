@@ -4,6 +4,7 @@ Unit = function (index, game, opts) {
   var y = opts.y || game.world.randomY;
   var color = opts.color || "#00ff00";
   var dec_color = parseInt(color.substr(1), 16);
+  this.device_id = opts.device_id;
   this.game = game;
   this.radius = 8;
 
