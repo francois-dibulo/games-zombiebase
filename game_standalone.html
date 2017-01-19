@@ -82,6 +82,7 @@
   <script type="text/javascript" src="js/libs/phaser.min.js"></script>
   <!-- Game specific -->
   <script type="text/javascript" src="js/game/phaser_game.js"></script>
+  <script type="text/javascript" src="js/game/models/enemy.js"></script>
   <script type="text/javascript" src="js/game/models/unit.js"></script>
   <script type="text/javascript" src="js/game/models/tower.js"></script>
   <script type="text/javascript" src="js/game/models/helicopter_landing.js"></script>
@@ -162,6 +163,10 @@
       // SHOOT
       } else if (KEY_UP === key_code) {
         PhaserGame.onPlayerInput(player_1, {
+          action: 'shoot'
+        });
+      } else if (KEY_W === key_code) {
+        PhaserGame.onPlayerInput(player_2, {
           action: 'shoot'
         });
       }

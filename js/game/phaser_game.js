@@ -34,6 +34,7 @@ var PhaserGame = {
     this.phaser.load.image('door_h', BASE_URL + 'door_h.png');
     this.phaser.load.image('helicopter_landing', BASE_URL + 'helicopter_landing.png');
     this.phaser.load.image('player', BASE_URL + 'player.png');
+    this.phaser.load.image('enemy', BASE_URL + 'enemy.png');
     this.phaser.load.image('bullet', BASE_URL + 'bullet.png');
     this.phaser.load.tilemap('map', 'assets/levels/level_0.json', null, Phaser.Tilemap.TILED_JSON);
   },
@@ -68,6 +69,14 @@ var PhaserGame = {
 
     this.map.setCollision([1, 2, 3]);
 
+    this.enemies_group = this.phaser.add.group();
+    this.enemies_group.classType = HelicopterLanding;
+    this.enemies_group.enableBody = true;
+    for (var i = 0; i < 10; i++) {
+      this.enemies_group.add(new Enemy(i, this.phaser));
+    }
+
+
     // Scale
     // var scale_manager = new Phaser.ScaleManager(this.phaser, this.map.widthInPixels, this.map.heightInPixels);
     // scale_manager.scaleMode = Phaser.ScaleManager.RESIZE;
@@ -76,12 +85,17 @@ var PhaserGame = {
     // scale_manager.refresh();
 
     this.buildPlayers();
+    var player_1 = this.objects['unit'][0];
+    this.enemies_group.forEach(function(enemy) {
+      enemy.moveTo(player_1);
+    }, this);
   },
 
   update: function () {
     if (this.objects['unit']) {
       this.phaser.physics.arcade.collide(this.objects['unit'], this.layer);
       this.phaser.physics.arcade.collide(this.objects['unit'], this.objects['unit']);
+      this.phaser.physics.arcade.collide(this.objects['unit'], this.enemies_group);
       this.phaser.physics.arcade.collide(this.objects['unit'], this.towers_group, function() {
       });
 
@@ -91,6 +105,13 @@ var PhaserGame = {
       // Bullets
       this.phaser.physics.arcade.collide(this.objects['unit'][0].weapon.bullets, this.layer, function(bullet, obj) {
         bullet.kill();
+      });
+
+      this.phaser.physics.arcade.collide(this.enemies_group, this.enemies_group);
+      this.phaser.physics.arcade.collide(this.enemies_group, this.layer);
+      this.phaser.physics.arcade.collide(this.objects['unit'][0].weapon.bullets, this.enemies_group, function(bullet, obj) {
+        bullet.kill();
+        obj.onBulletHit(bullet);
       });
 
       this.phaser.physics.arcade.collide(this.objects['unit'][0].weapon.bullets, this.objects['unit'], function(other_unit, bullet) {
