@@ -68,6 +68,15 @@ Tower.prototype.onMove = function(data) {
 
 Tower.prototype.onShoot = function(data) {
   this.weapon.fire();
+  var recoil_distance = 5;
+  var angle = Phaser.Math.reverseAngle(Phaser.Math.degToRad(this.canon.angle));
+  var x = this.canon.x + Math.cos(angle) * recoil_distance;
+  var y = this.canon.y + Math.sin(angle) * recoil_distance;
+
+  if (!this.recoil_tween || (this.recoil_tween && !this.recoil_tween.isRunning)) {
+    this.recoil_tween = this.game.add.tween(this.canon).to({ x: x, y: y }, 150, Phaser.Easing.Bounce.Out, true);
+    this.recoil_tween.yoyo(true, 0);
+  }
 };
 
 Tower.prototype.onUnitLeave = function(device_id) {
