@@ -35,7 +35,9 @@ var PhaserGame = {
       'helicopter_landing',
       'player',
       'enemy',
-      'bullet'
+      'bullet',
+      'item_ammo',
+      'waypoint'
     ];
     for (var i = 0; i < images.length; i++) {
       var file = images[i];
@@ -51,6 +53,8 @@ var PhaserGame = {
     this.map = this.phaser.add.tilemap('map');
     this.map.addTilesetImage('wall');
     this.map.addTilesetImage('tower');
+    this.map.addTilesetImage('item_ammo');
+    this.map.addTilesetImage('waypoint');
     //this.map.addTilesetImage('door_h');
     this.map.addTilesetImage('helicopter_landing');
 
@@ -58,12 +62,14 @@ var PhaserGame = {
     this.layer.resizeWorld();
 
     // Build Groups
+    this.addWaypointGroup();
     this.addTowerGroup();
     this.addHelicopterGroup();
     this.addEnemyGroup();
+    this.addItemGroup();
     this.buildPlayers();
 
-    this.map.setCollision([1, 2, 3]);
+    this.map.setCollision([1, 2, 3, 4]);
 
     // Scale
     // var scale_manager = new Phaser.ScaleManager(this.phaser, this.map.widthInPixels, this.map.heightInPixels);
@@ -75,13 +81,33 @@ var PhaserGame = {
     // Attack player 1
     var player_1 = this.groups['unit'].children[0];
     this.groups['enemy'].forEach(function(enemy) {
-      enemy.moveTo(player_1);
+      //enemy.moveTo(player_1);
     }, this);
   },
 
   // =====================================================================================
   // GROUPS
   // =====================================================================================
+  addWaypointGroup: function() {
+    var group = this.phaser.add.group();
+    group.classType = Item;
+    group.enableBody = false;
+    // name, gid, key, frame, exists, autoCull, group, CustomClass, adjustY
+    this.map.createFromObjects('Object Layer 1', 5, 'waypoint', 0, true, false, group);
+    this.groups['waypoint'] = group;
+  },
+
+  addItemGroup: function() {
+    var group = this.phaser.add.group();
+    group.classType = Item;
+    group.enableBody = true;
+    // name, gid, key, frame, exists, autoCull, group, CustomClass, adjustY
+    this.map.createFromObjects('Object Layer 1', 4, 'item_ammo', 0, false, false, group, Item);
+    this.groups['item'] = group;
+
+    var item = group.getRandom();
+    item.exists = true;
+  },
 
   addTowerGroup: function() {
     var group = this.phaser.add.group();
@@ -119,6 +145,8 @@ var PhaserGame = {
     var units_group = this.groups['unit'];
     var enemies_group = this.groups['enemy'];
     var towers_group = this.groups['tower'];
+    var items_group = this.groups['item'];
+    var waypoints_group = this.groups['waypoint'];
 
     // Units collision
     this.phaser.physics.arcade.collide(units_group, this.layer);
@@ -134,6 +162,13 @@ var PhaserGame = {
         unit.onVehicleJoin(tower);
         tower.addUnit(unit);
         player.unit = tower;
+      }
+    });
+
+    this.phaser.physics.arcade.collide(units_group, items_group, function(unit, item) {
+      if (unit.canCollect(item)) {
+        unit.collectItem(item);
+        item.kill();
       }
     });
 
@@ -172,6 +207,12 @@ var PhaserGame = {
     // Enemies
     this.phaser.physics.arcade.collide(enemies_group, enemies_group);
     this.phaser.physics.arcade.collide(enemies_group, this.layer);
+
+    this.phaser.physics.arcade.collide(enemies_group, waypoints_group, function(enemy, wp) {
+      // if (enemy.target_obj === wp) {
+      //   enemy.visited_waypoints.push(wp);
+      // }
+    });
     // Enemy view radius
     enemies_group.forEach(function(enemy) {
       var main_target = this.groups['helicopter_landing'].children[0];
@@ -191,7 +232,13 @@ var PhaserGame = {
 
       // Move to main object if it has no target
       if (!enemy.target_obj) {
-        enemy.moveTo(main_target);
+        var closest_wp = waypoints_group.getClosestTo(enemy, function(wp, distance) {
+
+        });
+        if (!closest_wp) {
+          closest_wp = main_target;
+        }
+        enemy.moveTo(closest_wp);
       }
     }, this);
   },

@@ -48,6 +48,9 @@ Unit = function (index, game, opts) {
   this.init_health = opts.init_health || UNIT_SPECS.HEALTH.MEDIUM;
   this.setHealth(this.init_health);
 
+  this.inventory = [];
+  this.max_inventory = 2;
+
   // Creates 30 bullets, using the 'bullet' graphic
   this.weapon = game.add.weapon(30, 'bullet');
   this.weapon.bulletKillType = Phaser.Weapon.KILL_DISTANCE;
@@ -104,4 +107,12 @@ Unit.prototype.onVehicleLeave = function(vehicle) {
   this.alive = true;
   this.visible = true;
   this.body.immovable = false;
+};
+
+Unit.prototype.canCollect = function(item) {
+  return this.max_inventory >= this.inventory.length;
+};
+
+Unit.prototype.collectItem = function(item) {
+  this.inventory.push(item.data);
 };
