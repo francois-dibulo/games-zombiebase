@@ -14,7 +14,7 @@ Enemy = function (index, game, opts) {
   this.body.collideWorldBounds = false;
 
   this.body.maxAngular = 300;
-  this.move_velocity = 10;
+  this.move_speed = 10;
   this.is_stop = true;
   this.angular_move_velocity = 100;
   this.setHealth(3);
@@ -28,9 +28,8 @@ Enemy.prototype = Object.create(Phaser.Sprite.prototype);
 Enemy.prototype.constructor = Enemy;
 
 Enemy.prototype.update = function() {
-  //this.game.physics.arcade.velocityFromAngle(this.angle, this.move_velocity, this.body.velocity);
   if (this.target_obj) {
-    this.game.physics.arcade.moveToObject(this, this.target_obj, this.move_velocity);
+    this.game.physics.arcade.moveToObject(this, this.target_obj, this.move_speed);
     this.rotation = this.game.physics.arcade.angleToXY(this, this.target_obj.x, this.target_obj.y);
   }
 };

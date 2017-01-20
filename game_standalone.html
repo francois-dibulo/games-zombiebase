@@ -34,7 +34,7 @@
       - Speed: slow
 
     MEDIC:
-      - Can heal / revive players
+      - Can heal / revive players / self-heal?
       - Max Ammo: 5 | Low Range | Medium FQ
       - Max Health: 10
       - Speed: fast
@@ -81,9 +81,14 @@
   <script type="text/javascript" src="js/libs/lodash_ext.js"></script>
   <script type="text/javascript" src="js/libs/phaser.min.js"></script>
   <!-- Game specific -->
+  <script type="text/javascript" src="js/game/globals.js"></script>
   <script type="text/javascript" src="js/game/phaser_game.js"></script>
   <script type="text/javascript" src="js/game/models/enemy.js"></script>
   <script type="text/javascript" src="js/game/models/unit.js"></script>
+  <script type="text/javascript" src="js/game/models/engineer_unit.js"></script>
+  <script type="text/javascript" src="js/game/models/medic_unit.js"></script>
+  <script type="text/javascript" src="js/game/models/soldier_unit.js"></script>
+  <script type="text/javascript" src="js/game/models/pilot_unit.js"></script>
   <script type="text/javascript" src="js/game/models/tower.js"></script>
   <script type="text/javascript" src="js/game/models/helicopter_landing.js"></script>
   <script type="text/javascript">
@@ -96,22 +101,28 @@
       color: "#37b2ff",
       device_id: 1,
       current_view: null,
+      class_type: 'EngineerUnit',
       stats: {},
       move: {
         left: false,
         right: false
-      }
+      },
+      unit: null,
+      default_unit: null
     };
     var player_2 = {
       name: "Guest 2",
       color: "#afff37",
       device_id: 2,
       current_view: null,
+      class_type: 'MedicUnit',
       stats: {},
       move: {
         left: false,
         right: false
-      }
+      },
+      unit: null,
+      default_unit: null
     };
 
     var teams = [
@@ -125,6 +136,9 @@
 
     PhaserGame.init(airconsole, teams);
 
+    // ===================================================================================
+    // EVENTS
+    // ===================================================================================
 
     var KEY_LEFT = 37;
     var KEY_RIGHT = 39;

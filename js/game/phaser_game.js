@@ -127,7 +127,14 @@ var PhaserGame = {
     this.phaser.physics.arcade.collide(units_group, this.layer);
     this.phaser.physics.arcade.collide(units_group, units_group);
     this.phaser.physics.arcade.collide(units_group, enemies_group);
-    this.phaser.physics.arcade.collide(units_group, towers_group);
+    this.phaser.physics.arcade.collide(units_group, towers_group, function(unit, tower) {
+      if (tower.canUnitJoin()) {
+        var player = self.getPlayerByDeviceId(unit.device_id);
+        unit.onVehicleJoin(tower);
+        tower.addUnit(unit);
+        player.unit = tower;
+      }
+    });
 
     // Unit Bullets
     units_group.forEach(function(unit) {
@@ -190,8 +197,9 @@ var PhaserGame = {
           x: start_base.x + 16 * p,
           y: start_base.y
         };
-        var unit = new Unit(p, this.phaser, opts);
+        var unit = new window[player.class_type](p, this.phaser, opts);
         player.unit = unit;
+        player.default_unit = unit;
         group.add(unit);
       }
     }
