@@ -225,6 +225,13 @@ var PhaserGame = {
       if (params.action === "shoot") {
         player.unit.onShoot();
       }
+      if (params.action === "exit_vehicle") {
+        if (player.unit.onUnitLeave) {
+          player.unit.onUnitLeave(player.device_id);
+          player.unit = player.default_unit;
+          player.unit.onVehicleLeave();
+        }
+      }
     }
   }
 };

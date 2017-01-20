@@ -146,6 +146,8 @@
     var KEY_A = 65;
     var KEY_D = 68;
     var KEY_W = 87;
+    var KEY_E = 69;
+    var KEY_X = 88;
 
     function sendMoveEvent() {
       PhaserGame.onPlayerInput(player_1, {
@@ -182,6 +184,10 @@
       } else if (KEY_W === key_code) {
         PhaserGame.onPlayerInput(player_2, {
           action: 'shoot'
+        });
+      } else if (KEY_X === key_code) {
+        PhaserGame.onPlayerInput(player_1, {
+          action: 'exit_vehicle'
         });
       }
       if (is_move_evt) {

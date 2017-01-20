@@ -3,7 +3,7 @@ var Tower = function (game, x, y, key, frame) {
   Phaser.Sprite.apply(this, arguments);
   this.game = game;
   this.weapon = null;
-  this.units = [];
+  this.units = {};
   this.unit_capacity = 1;
 
   this.angular_move_velocity = 100;
@@ -27,19 +27,19 @@ Tower.prototype.update = function() {
 };
 
 Tower.prototype.canUnitJoin = function() {
-  return this.units.length < this.unit_capacity;
+  return Object.keys(this.units).length < this.unit_capacity;
 };
 
 Tower.prototype.addUnit = function(unit) {
   var joined = this.canUnitJoin();
   if (joined) {
-    this.units.push(unit);
+    this.units[unit.device_id] = unit;
   }
   return joined;
 };
 
-Tower.prototype.removeUnit = function(unit) {
-
+Tower.prototype.removeUnit = function(device_id) {
+  delete this.units[device_id];
 };
 
 Tower.prototype.initWeapon = function() {
@@ -53,7 +53,7 @@ Tower.prototype.initWeapon = function() {
 };
 
 Tower.prototype.onFireLimit = function() {
-
+  console.log("Tower out of ammo");
 };
 
 Tower.prototype.onMove = function(data) {
@@ -70,6 +70,6 @@ Tower.prototype.onShoot = function(data) {
   this.weapon.fire();
 };
 
-Tower.prototype.onUnitLeave = function(unit) {
-  this.removeUnit(unit);
+Tower.prototype.onUnitLeave = function(device_id) {
+  this.removeUnit(device_id);
 };
