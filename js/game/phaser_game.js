@@ -284,6 +284,7 @@ var PhaserGame = {
         player.unit = unit;
         player.default_unit = unit;
         group.add(unit);
+        unit.update_device_signal.add(this.updateCustomDeviceData, this);
       }
     }
     this.groups['unit'] = group;
@@ -310,5 +311,27 @@ var PhaserGame = {
         }
       }
     }
-  }
+  },
+
+  updateCustomDeviceData: function(unit) {
+    var custom_data = {};
+    for (var i = 0; i < this.teams.length; i++) {
+      var players = this.teams[i].players;
+      for (var p = 0; p < players.length; p++) {
+        var player = players[p];
+        var unit = player.default_unit;
+        var opts = {
+          name: player.name,
+          color: player.color,
+          current_view: player.current_view,
+          class_type: player.class_type,
+          stats: player.stats,
+          unit: unit.toCustomData()
+        };
+        custom_data[player.device_id] = opts;
+      }
+    }
+    this.airconsole.setCustomDeviceStateProperty('players', custom_data);
+  },
+
 };

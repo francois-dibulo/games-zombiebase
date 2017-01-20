@@ -22,6 +22,7 @@ Unit = function (index, game, opts) {
   this.radius = 8;
 
   Phaser.Sprite.call(this, game, x, y, opts.sprite_key || 'player');
+  this.unit_type = 'Unit';
 
   this.anchor.setTo(0.5, 0.5);
   game.physics.enable(this, Phaser.Physics.ARCADE);
@@ -59,6 +60,8 @@ Unit = function (index, game, opts) {
   this.weapon.fireRate = opts.fire_rate || UNIT_SPECS.FIRE_RATE.MEDIUM;
   this.weapon.trackSprite(this, 0, 0, true);
   this.weapon.onFireLimit.add(this.onFireLimit.bind(this));
+
+  this.update_device_signal = new Phaser.Signal();
 };
 
 Unit.prototype = Object.create(Phaser.Sprite.prototype);
@@ -75,7 +78,7 @@ Unit.prototype.onFireLimit = function() {
 
 Unit.prototype.onHit = function(obj) {
   this.damage(1);
-  console.log("HIT", this.health);
+  this.update_device_signal.dispatch();
 };
 
 Unit.prototype.onMove = function(data) {
@@ -96,6 +99,10 @@ Unit.prototype.onShoot = function(data) {
   this.weapon.fire();
 };
 
+Unit.prototype.getShotsLeft = function(data) {
+  return this.weapon.fireLimit - this.weapon.shots;
+};
+
 Unit.prototype.onVehicleJoin = function(vehicle) {
   this.alive = false;
   this.visible = false;
@@ -114,5 +121,19 @@ Unit.prototype.canCollect = function(item) {
 };
 
 Unit.prototype.collectItem = function(item) {
-  this.inventory.push(item.data);
+  // this.inventory.push(item.data);
+  if (item.name === "item_ammo") {
+    var amount = item.data.amount;
+    this.weapon.resetShots(this.getShotsLeft() + amount);
+  }
 };
+
+Unit.prototype.toCustomData = function() {
+  return {
+    alive: this.alive,
+    health: this.health,
+    inventory: this.inventory,
+    ammo: this.getShotsLeft()
+  };
+};
+

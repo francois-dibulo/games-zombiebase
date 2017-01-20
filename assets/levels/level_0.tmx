@@ -73,7 +73,11 @@
   <object id="1" name="tower_0" type="tower" gid="2" x="432" y="288" width="32" height="32"/>
   <object id="2" name="tower_1" type="tower" gid="2" x="336" y="464" width="32" height="32"/>
   <object id="3" name="helicopter_landing_0" type="helicopter_landing" gid="3" x="416" y="416" width="64" height="64"/>
-  <object id="4" name="item_ammo_0" type="item_ammo" gid="4" x="624" y="96" width="16" height="16"/>
+  <object id="4" name="item_ammo" type="ammo" gid="4" x="624" y="96" width="16" height="16">
+   <properties>
+    <property name="data.amount" type="int" value="20"/>
+   </properties>
+  </object>
   <object id="10" name="wp" gid="2" x="896" y="608" width="32" height="32"/>
   <object id="11" name="wp" gid="5" x="624" y="256" width="16" height="16"/>
   <object id="12" name="wp" gid="5" x="800" y="256" width="16" height="16"/>

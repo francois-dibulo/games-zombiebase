@@ -56,9 +56,17 @@
                  "gid":4,
                  "height":16,
                  "id":4,
-                 "name":"item_ammo_0",
+                 "name":"item_ammo",
+                 "properties":
+                    {
+                     "data.amount":20
+                    },
+                 "propertytypes":
+                    {
+                     "data.amount":"int"
+                    },
                  "rotation":0,
-                 "type":"item_ammo",
+                 "type":"ammo",
                  "visible":true,
                  "width":16,
                  "x":624,
