@@ -104,7 +104,7 @@ var PhaserGame = {
     var group = this.phaser.add.group();
     group.classType = HelicopterLanding;
     group.enableBody = true;
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < 4; i++) {
       group.add(new Enemy(i, this.phaser));
     }
     this.groups['enemy'] = group;
@@ -164,6 +164,23 @@ var PhaserGame = {
     // Enemies
     this.phaser.physics.arcade.collide(enemies_group, enemies_group);
     this.phaser.physics.arcade.collide(enemies_group, this.layer);
+    // Enemy view radius
+    enemies_group.forEach(function(enemy) {
+      units_group.forEach(function(unit) {
+        if (unit.alive && unit.visible && enemy.alive) {
+          var distance = Phaser.Math.distance(unit.x, unit.y, enemy.x, enemy.y);
+          if (distance < enemy.view_radius &&
+            ((enemy.target_obj && enemy.target_obj.device_id !== unit.device_id) || !enemy.target_obj )) {
+            enemy.moveTo(unit);
+          }
+          if (distance > enemy.view_radius * 2 &&
+              (enemy.target_obj && enemy.target_obj.device_id === unit.device_id)) {
+            var main_target = this.groups['helicopter_landing'].children[0];
+            enemy.moveTo(main_target);
+          }
+        }
+      }, this);
+    }, this);
   },
 
   render: function () {

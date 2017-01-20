@@ -4,6 +4,8 @@ Enemy = function (index, game, opts) {
   var y = opts.y || game.world.randomY;
   this.game = game;
   this.radius = 8;
+  this.view_radius = Phaser.Math.between(50, 100);
+  this.view_radius_circle = new Phaser.Circle(x, y, this.view_radius);
 
   Phaser.Sprite.call(this, game, x, y, 'enemy');
 
@@ -14,7 +16,7 @@ Enemy = function (index, game, opts) {
   this.body.collideWorldBounds = false;
 
   this.body.maxAngular = 300;
-  this.move_speed = 10;
+  this.move_speed = Phaser.Math.between(5, 20);
   this.is_stop = true;
   this.angular_move_velocity = 100;
   this.setHealth(3);
