@@ -123,7 +123,11 @@ var PhaserGame = {
     // Units collision
     this.phaser.physics.arcade.collide(units_group, this.layer);
     this.phaser.physics.arcade.collide(units_group, units_group);
-    this.phaser.physics.arcade.collide(units_group, enemies_group);
+    this.phaser.physics.arcade.collide(units_group, enemies_group, function(unit, enemy) {
+      if (unit.visible) {
+        enemy.attack(unit);
+      }
+    });
     this.phaser.physics.arcade.collide(units_group, towers_group, function(unit, tower) {
       if (tower.canUnitJoin()) {
         var player = self.getPlayerByDeviceId(unit.device_id);
@@ -143,11 +147,11 @@ var PhaserGame = {
 
       this.phaser.physics.arcade.collide(bullets, enemies_group, function(bullet, obj) {
         bullet.kill();
-        obj.onBulletHit(bullet);
+        obj.onHit(bullet);
       });
 
       this.phaser.physics.arcade.collide(bullets, units_group, function(bullet, other_unit) {
-        other_unit.onBulletHit(bullet);
+        other_unit.onHit(bullet);
         bullet.kill();
       });
     }, this);
@@ -157,7 +161,11 @@ var PhaserGame = {
       var bullets = tower.weapon.bullets;
       this.phaser.physics.arcade.collide(bullets, enemies_group, function(bullet, obj) {
         bullet.kill();
-        obj.onBulletHit(bullet);
+        obj.onHit(bullet);
+      });
+      this.phaser.physics.arcade.collide(bullets, units_group, function(bullet, obj) {
+        bullet.kill();
+        obj.onHit(bullet);
       });
     }, this);
 
@@ -166,6 +174,7 @@ var PhaserGame = {
     this.phaser.physics.arcade.collide(enemies_group, this.layer);
     // Enemy view radius
     enemies_group.forEach(function(enemy) {
+      var main_target = this.groups['helicopter_landing'].children[0];
       units_group.forEach(function(unit) {
         if (unit.alive && unit.visible && enemy.alive) {
           var distance = Phaser.Math.distance(unit.x, unit.y, enemy.x, enemy.y);
@@ -175,11 +184,15 @@ var PhaserGame = {
           }
           if (distance > enemy.view_radius * 2 &&
               (enemy.target_obj && enemy.target_obj.device_id === unit.device_id)) {
-            var main_target = this.groups['helicopter_landing'].children[0];
             enemy.moveTo(main_target);
           }
         }
       }, this);
+
+      // Move to main object if it has no target
+      if (!enemy.target_obj) {
+        enemy.moveTo(main_target);
+      }
     }, this);
   },
 
@@ -218,7 +231,7 @@ var PhaserGame = {
           color: player.color,
           label: player.name,
           x: start_base.x + 16 * p,
-          y: start_base.y
+          y: start_base.y + 16 * p
         };
         var unit = new window[player.class_type](p, this.phaser, opts);
         player.unit = unit;

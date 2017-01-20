@@ -1,8 +1,8 @@
 var UNIT_SPECS = {
   HEALTH: {
     LOW: 1,
-    MEDIUM: 5,
-    HIGH: 8
+    MEDIUM: 3,
+    HIGH: 5
   },
   BULLET_DISTANCE: {
     LOW: 150,

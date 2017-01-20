@@ -23,6 +23,9 @@ Enemy = function (index, game, opts) {
 
   this.target_obj = null;
 
+  this.attack_lock = null;
+  this.attack_rate = 1000;
+
   game.add.existing(this);
 };
 
@@ -31,16 +34,30 @@ Enemy.prototype.constructor = Enemy;
 
 Enemy.prototype.update = function() {
   if (this.target_obj) {
-    this.game.physics.arcade.moveToObject(this, this.target_obj, this.move_speed);
-    this.rotation = this.game.physics.arcade.angleToXY(this, this.target_obj.x, this.target_obj.y);
+    if (this.target_obj.alive) {
+      this.game.physics.arcade.moveToObject(this, this.target_obj, this.move_speed);
+      this.rotation = this.game.physics.arcade.angleToXY(this, this.target_obj.x, this.target_obj.y);
+    } else {
+      this.target_obj = null;
+    }
   }
 };
 
-Enemy.prototype.onBulletHit = function() {
+Enemy.prototype.onHit = function() {
   this.damage(1);
   console.log("HIT", this.health);
 };
 
 Enemy.prototype.moveTo = function(obj) {
   this.target_obj = obj;
+};
+
+Enemy.prototype.attack = function(obj) {
+  var now = new Date().getTime();
+  var can_attack = now > this.attack_lock + this.attack_rate;
+  if (!this.attack_lock ||
+      (this.attack_lock && can_attack)) {
+    this.attack_lock = now;
+    obj.onHit(this);
+  }
 };

@@ -70,7 +70,7 @@ Unit.prototype.onFireLimit = function() {
   console.log("OUT OF AMMO");
 };
 
-Unit.prototype.onBulletHit = function() {
+Unit.prototype.onHit = function(obj) {
   this.damage(1);
   console.log("HIT", this.health);
 };
