@@ -8,13 +8,22 @@ var Tower = function (game, x, y, key, frame) {
 
   this.angular_move_velocity = 100;
 
+  game.physics.enable(this, Phaser.Physics.ARCADE);
+  this.body.immovable = true;
+  this.body.moves = false;
+
+  this.canon = game.add.sprite(0, 0, 'tower_canon');
+  this.canon.anchor.setTo(0, 0.5);
+  game.physics.enable(this.canon, Phaser.Physics.ARCADE);
+  this.canon.alignIn(this, Phaser.CENTER_CENTER, -16, 20);
+
   this.initWeapon();
 };
 Tower.prototype = Object.create(Phaser.Sprite.prototype);
 Tower.prototype.constructor = Tower;
 
 Tower.prototype.update = function() {
-
+  this.game.physics.arcade.velocityFromAngle(this.canon.angle, 0, this.canon.body.velocity);
 };
 
 Tower.prototype.canUnitJoin = function() {
@@ -39,19 +48,21 @@ Tower.prototype.initWeapon = function() {
   this.weapon.bulletKillDistance = UNIT_SPECS.BULLET_DISTANCE.HIGH;
   this.weapon.fireLimit = UNIT_SPECS.AMMO.HIGH;
   this.weapon.fireRate = UNIT_SPECS.FIRE_RATE.MEDIUM;
-  this.weapon.trackSprite(this, 0, 0, true);
+  this.weapon.trackSprite(this.canon, this.canon.width, -this.canon.height / 4, true);
   this.weapon.onFireLimit.add(this.onFireLimit.bind(this));
 };
 
 Tower.prototype.onFireLimit = function() {
-  this.game.physics.arcade.velocityFromAngle(this.angle, 0, this.body.velocity);
+
 };
 
 Tower.prototype.onMove = function(data) {
   if (data.left) {
-    this.body.angularVelocity = -this.angular_move_velocity;
+    this.canon.body.angularVelocity = -this.angular_move_velocity;
   } else if (data.right) {
-    this.body.angularVelocity = this.angular_move_velocity;
+    this.canon.body.angularVelocity = this.angular_move_velocity;
+  } else {
+    this.canon.body.angularVelocity = 0;
   }
 };
 

@@ -30,6 +30,7 @@ var PhaserGame = {
     var images = [
       'wall',
       'tower',
+      'tower_canon',
       'door_h',
       'helicopter_landing',
       'player',
@@ -88,8 +89,6 @@ var PhaserGame = {
     group.enableBody = true;
     // name, gid, key, frame, exists, autoCull, group, CustomClass, adjustY
     this.map.createFromObjects('Object Layer 1', 2, 'tower', 0, true, false, group, Tower);
-    group.setAll('body.immovable', true);
-    group.setAll('body.moves', false);
     this.groups['tower'] = group;
   },
 
@@ -97,8 +96,6 @@ var PhaserGame = {
     var group = this.phaser.add.group();
     group.classType = HelicopterLanding;
     group.enableBody = true;
-    group.setAll('body.immovable', true);
-    group.setAll('body.moves', false);
     this.map.createFromObjects('Object Layer 1', 3, 'helicopter_landing', 0, true, false, group, HelicopterLanding);
     this.groups['helicopter_landing'] = group;
   },
@@ -152,6 +149,15 @@ var PhaserGame = {
       this.phaser.physics.arcade.collide(bullets, units_group, function(bullet, other_unit) {
         other_unit.onBulletHit(bullet);
         bullet.kill();
+      });
+    }, this);
+
+    // Tower Bullets
+    towers_group.forEach(function(tower) {
+      var bullets = tower.weapon.bullets;
+      this.phaser.physics.arcade.collide(bullets, enemies_group, function(bullet, obj) {
+        bullet.kill();
+        obj.onBulletHit(bullet);
       });
     }, this);
 
