@@ -186,13 +186,17 @@ var PhaserGame = {
       });
 
       this.phaser.physics.arcade.collide(bullets, enemies_group, function(bullet, obj) {
-        bullet.kill();
-        obj.onHit(bullet);
+        if (obj.alive) {
+          bullet.kill();
+          obj.onHit(bullet);
+        }
       });
 
       this.phaser.physics.arcade.collide(bullets, units_group, function(bullet, other_unit) {
-        other_unit.onHit(bullet);
-        bullet.kill();
+        if (other_unit.alive) {
+          other_unit.onHit(bullet);
+          bullet.kill();
+        }
       });
     }, this);
 
@@ -200,12 +204,16 @@ var PhaserGame = {
     towers_group.forEach(function(tower) {
       var bullets = tower.weapon.bullets;
       this.phaser.physics.arcade.collide(bullets, enemies_group, function(bullet, obj) {
-        bullet.kill();
-        obj.onHit(bullet);
+        if (obj.alive) {
+          bullet.kill();
+          obj.onHit(bullet);
+        }
       });
       this.phaser.physics.arcade.collide(bullets, units_group, function(bullet, obj) {
-        bullet.kill();
-        obj.onHit(bullet);
+        if (obj.alive) {
+          bullet.kill();
+          obj.onHit(bullet);
+        }
       });
     }, this);
 
@@ -274,7 +282,7 @@ var PhaserGame = {
     //this.objects['unit'] = [];
     var group = this.phaser.add.group();
     for (var i = 0; i < this.teams.length; i++) {
-      var start_base = this.groups['helicopter_landing'].children[i];
+      var start_base = this.groups['waypoint'].children[i];
       var players = this.teams[i].players;
       for (var p = 0; p < players.length; p++) {
         var player = players[p];
