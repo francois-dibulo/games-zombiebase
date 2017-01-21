@@ -23,5 +23,15 @@ var UNIT_SPECS = {
     LOW: 20,
     MEDIUM: 30,
     FAST: 40
+  },
+  KILL_COUTDOWN: {
+    LOW: 15,
+    MEDIUM: 25,
+    HIGH: 35
+  },
+  HEAL_RATE: {
+    LOW: 1000,
+    MEDIUM: 600,
+    HIGH: 400
   }
 };

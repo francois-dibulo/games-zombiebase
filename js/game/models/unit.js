@@ -52,7 +52,7 @@ Unit = function (index, game, opts) {
   this.setHealth(this.init_health);
   this.kill_timeout = null;
   this.seconds_until_kill = null;
-  this.kill_start_seconds = 15;
+  this.kill_start_seconds = opts.kill_countdown || UNIT_SPECS.KILL_COUTDOWN.MEDIUM;
 
   this.inventory = [];
   this.max_inventory = 2;
@@ -109,13 +109,14 @@ Unit.prototype.killCountdown = function() {
   var direction = this.is_healing && this.track_colliding_obj !== null ? 1 : -1;
   this.seconds_until_kill += direction;
 
-  if (this.seconds_until_kill === this.kill_start_seconds) {
+  if (this.seconds_until_kill >= this.kill_start_seconds) {
     this.setRevived();
   } else if (this.seconds_until_kill <= 0) {
     this.killUnit();
   } else {
+    var next_call = direction === 1 ? this.track_colliding_obj.data.heal_rate : Phaser.Timer.SECOND * 1;
     this.text1.text = this.player_name + " (" + (this.seconds_until_kill) + ")";
-    this.kill_timeout = this.game.time.events.add(Phaser.Timer.SECOND * 1, this.killCountdown, this);
+    this.kill_timeout = this.game.time.events.add(next_call, this.killCountdown, this);
   }
 };
 
