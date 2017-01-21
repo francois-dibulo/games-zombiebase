@@ -20,12 +20,14 @@ Unit = function (index, game, opts) {
   this.device_id = opts.device_id;
   this.game = game;
   this.radius = 8;
+  this.player_name = opts.label || "Player";
 
   Phaser.Sprite.call(this, game, x, y, opts.sprite_key || 'player');
   this.unit_type = 'Unit';
 
   this.anchor.setTo(0.5, 0.5);
   game.physics.enable(this, Phaser.Physics.ARCADE);
+  this.body.setCircle(this.radius);
   this.body.maxVelocity = 1;
   this.body.immovable = false;
   this.body.collideWorldBounds = true;
@@ -44,13 +46,18 @@ Unit = function (index, game, opts) {
   game.add.existing(this);
 
   var style = { font: "10px Courier", fill: color };
-  this.text1 = game.add.text(0, 0, opts.label || "Player", style);
+  this.text1 = game.add.text(0, 0, this.player_name, style);
 
   this.init_health = opts.init_health || UNIT_SPECS.HEALTH.MEDIUM;
   this.setHealth(this.init_health);
+  this.kill_timeout = null;
+  this.seconds_until_kill = null;
+  this.kill_start_seconds = 15;
 
   this.inventory = [];
   this.max_inventory = 2;
+
+  this.track_colliding_obj = null;
 
   // Creates 30 bullets, using the 'bullet' graphic
   this.weapon = game.add.weapon(30, 'bullet');
@@ -58,7 +65,7 @@ Unit = function (index, game, opts) {
   this.weapon.bulletKillDistance = opts.bullet_kill_distance || UNIT_SPECS.BULLET_DISTANCE.MEDIUM;
   this.weapon.fireLimit = opts.fire_limit || UNIT_SPECS.AMMO.MEDIUM;
   this.weapon.fireRate = opts.fire_rate || UNIT_SPECS.FIRE_RATE.MEDIUM;
-  this.weapon.trackSprite(this, 0, 0, true);
+  this.weapon.trackSprite(this, this.radius, 0, true);
   this.weapon.onFireLimit.add(this.onFireLimit.bind(this));
 
   this.update_device_signal = new Phaser.Signal();
@@ -70,14 +77,89 @@ Unit.prototype.constructor = Unit;
 Unit.prototype.update = function() {
   this.text1.alignTo(this, Phaser.CENTER_TOP, 16);
   this.game.physics.arcade.velocityFromAngle(this.angle, this.move_velocity, this.body.velocity);
+
+  // Check if still touching tracking object
+  if (this.track_colliding_obj) {
+    var distance = this.game.physics.arcade.distanceBetween(this, this.track_colliding_obj);
+    var is_still_touching = distance <= 2 * this.radius + this.radius / 4;
+    if (!is_still_touching) {
+      this.track_colliding_obj = null;
+    }
+  }
 };
 
 Unit.prototype.onFireLimit = function() {
   console.log("OUT OF AMMO");
 };
 
+Unit.prototype.setInjured = function() {
+  if (!this.alive) return;
+  this.alive = false;
+  this.visible = true;
+  this.move_velocity = 0;
+  this.body.immovable = true;
+  this.alpha = 0.5;
+
+  this.seconds_until_kill = this.kill_start_seconds;
+  this.killCountdown();
+};
+
+Unit.prototype.killCountdown = function() {
+  if (this.seconds_until_kill === null) return;
+  var direction = this.is_healing && this.track_colliding_obj !== null ? 1 : -1;
+  this.seconds_until_kill += direction;
+
+  if (this.seconds_until_kill === this.kill_start_seconds) {
+    this.setRevived();
+  } else if (this.seconds_until_kill <= 0) {
+    this.killUnit();
+  } else {
+    this.text1.text = this.player_name + " (" + (this.seconds_until_kill) + ")";
+    this.kill_timeout = this.game.time.events.add(Phaser.Timer.SECOND * 1, this.killCountdown, this);
+  }
+};
+
+Unit.prototype.killUnit = function() {
+  this.text1.text = this.player_name + " (DEAD)";
+  this.game.time.events.remove(this.kill_timeout);
+  this.seconds_until_kill = null;
+  this.track_colliding_obj = null;
+  this.kill();
+  //TODO: either dead or turns into zombie
+};
+
+Unit.prototype.healUnit = function() {
+  if (this.seconds_until_kill !== null && this.seconds_until_kill > 0) {
+    this.is_healing = true;
+  }
+};
+
+Unit.prototype.collidesWithUnit = function(unit) {
+  if (this.seconds_until_kill && unit.unit_type === "MedicUnit") {
+    this.track_colliding_obj = unit;
+    this.healUnit();
+  }
+};
+
+Unit.prototype.setRevived = function() {
+  this.alpha = 1;
+  this.kill_timeout = null;
+  this.game.time.events.remove(this.kill_timeout);
+  this.game.time.events.remove(this.kill_countdown);
+  this.seconds_until_kill = null;
+  this.alive = true;
+  this.body.immovable = false;
+  this.is_healing = false;
+  this.text1.text = this.player_name;
+  this.track_colliding_obj = null;
+};
+
 Unit.prototype.onHit = function(obj) {
-  this.damage(1);
+  if (this.health === 1) {
+    this.setInjured();
+  } else if (!this.kill_timeout) {
+    this.damage(1);
+  }
   this.update_device_signal.dispatch();
 };
 

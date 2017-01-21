@@ -150,7 +150,12 @@ var PhaserGame = {
 
     // Units collision
     this.phaser.physics.arcade.collide(units_group, this.layer);
-    this.phaser.physics.arcade.collide(units_group, units_group);
+    this.phaser.physics.arcade.collide(units_group, units_group, function(unit, other_unit) {
+      if (unit.visible && other_unit.visible) {
+        other_unit.collidesWithUnit(unit);
+        unit.collidesWithUnit(other_unit);
+      }
+    });
     this.phaser.physics.arcade.collide(units_group, enemies_group, function(unit, enemy) {
       if (unit.visible) {
         enemy.attack(unit);

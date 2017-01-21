@@ -11,6 +11,7 @@ Enemy = function (index, game, opts) {
 
   this.anchor.setTo(0.5, 0.5);
   game.physics.enable(this, Phaser.Physics.ARCADE);
+  this.body.setCircle(this.radius);
   this.body.maxVelocity = 1;
   this.body.immovable = false;
   this.body.collideWorldBounds = false;
