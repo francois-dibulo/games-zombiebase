@@ -162,7 +162,7 @@ var PhaserGame = {
       }
     });
     this.phaser.physics.arcade.collide(units_group, towers_group, function(unit, tower) {
-      if (tower.canUnitJoin()) {
+      if (tower.canUnitJoin() && unit.alive) {
         var player = self.getPlayerByDeviceId(unit.device_id);
         unit.onVehicleJoin(tower);
         tower.addUnit(unit);
@@ -257,7 +257,9 @@ var PhaserGame = {
   },
 
   render: function () {
-
+    if (this.groups['unit'] && this.groups['unit'].children) {
+      // this.phaser.debug.body(this.groups['unit'].children[0]);
+    }
   },
 
   // =====================================================================================
@@ -317,10 +319,11 @@ var PhaserGame = {
         player.unit.onShoot();
       }
       if (params.action === "exit_vehicle") {
-        if (player.unit.onUnitLeave) {
-          player.unit.onUnitLeave(player.device_id);
+        var vehicle = player.unit;
+        if (vehicle && vehicle.onUnitLeave) {
+          vehicle.onUnitLeave(player.device_id);
           player.unit = player.default_unit;
-          player.unit.onVehicleLeave();
+          player.unit.onVehicleLeave(vehicle);
         }
       }
     }

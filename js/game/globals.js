@@ -22,7 +22,7 @@ var UNIT_SPECS = {
   SPEED: {
     LOW: 20,
     MEDIUM: 30,
-    FAST: 40
+    FAST: 70
   },
   KILL_COUTDOWN: {
     LOW: 15,

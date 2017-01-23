@@ -189,14 +189,29 @@ Unit.prototype.getShotsLeft = function(data) {
 Unit.prototype.onVehicleJoin = function(vehicle) {
   this.alive = false;
   this.visible = false;
+  this.body.angularVelocity = 0;
   this.move_velocity = 0;
   this.body.immovable = true;
 };
 
+Unit.prototype.render = function() {
+  this.game.debug.body(this);
+};
+
 Unit.prototype.onVehicleLeave = function(vehicle) {
-  this.alive = true;
+  var self = this;
+  var angle = Phaser.Math.angleBetween(vehicle.centerX, vehicle.centerY, this.x, this.y);
+  var diagonal = Phaser.Math.distance(vehicle.centerX, vehicle.centerY, vehicle.x, vehicle.y);
+  var distance = this.radius + diagonal + 4;
   this.visible = true;
-  this.body.immovable = false;
+  this.x = vehicle.centerX + Math.cos(angle) * distance;
+  this.y = vehicle.centerY + Math.sin(angle) * distance;
+  this.rotation = angle;
+  // yeah - otherwise it will trigger onCollide again
+  this.game.time.events.add(Phaser.Timer.SECOND * 0.5, function() {
+    this.alive = true;
+    this.body.immovable = false;
+  }, this);
 };
 
 Unit.prototype.canCollect = function(item) {
