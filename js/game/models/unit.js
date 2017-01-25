@@ -189,6 +189,7 @@ Unit.prototype.getShotsLeft = function(data) {
 Unit.prototype.onVehicleJoin = function(vehicle) {
   this.alive = false;
   this.visible = false;
+  this.exists = false;
   this.body.angularVelocity = 0;
   this.move_velocity = 0;
   this.body.immovable = true;
@@ -209,6 +210,7 @@ Unit.prototype.onVehicleLeave = function(vehicle) {
   this.rotation = angle;
   // yeah - otherwise it will trigger onCollide again
   this.game.time.events.add(Phaser.Timer.SECOND * 0.5, function() {
+    this.exists = true;
     this.alive = true;
     this.body.immovable = false;
   }, this);
