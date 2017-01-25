@@ -15,6 +15,7 @@ var PhaserGame = {
   init: function(airconsole, teams, mode) {
     this.airconsole = airconsole;
     this.teams = teams;
+    console.log(this.teams);
     this.mode = mode;
     this.phaser = new Phaser.Game(1120, 800, Phaser.AUTO, 'phaser-container', {
       preload: this.preload.bind(this),
@@ -335,8 +336,9 @@ var PhaserGame = {
     var teams = this.teams;
     //this.objects['unit'] = [];
     var group = this.phaser.add.group();
+    var start_base = this.groups['waypoint'].children[0];
     for (var i = 0; i < this.teams.length; i++) {
-      var start_base = this.groups['waypoint'].children[i];
+      //var start_base = this.groups['waypoint'].children[i];
       var players = this.teams[i].players;
       for (var p = 0; p < players.length; p++) {
         var player = players[p];

@@ -30,7 +30,22 @@ App.services.factory('PlayerService', ['AirConsoleService', function (AirConsole
       var player_map_key = 'player_map_key';
 
       service.updatePlayersMap = function() {
-        airconsole.setCustomDeviceStateProperty(player_map_key, this.players_map);
+        var formated_map = {};
+        for (var device_id in this.players_map) {
+          var player = this.players_map[device_id];
+          formated_map[device_id] = {
+            device_id: device_id,
+            color: player.color,
+            stats: player.stats,
+            team_index: player.team_index,
+            name: player.name,
+            img: player.img,
+            current_view: player.current_view,
+            class_type: player.class_type,
+            move: player.move
+          }
+        };
+        airconsole.setCustomDeviceStateProperty(player_map_key, formated_map);
       };
       service.updatePlayersMap();
 
@@ -43,14 +58,19 @@ App.services.factory('PlayerService', ['AirConsoleService', function (AirConsole
           stats: {},
           team_index: null,
           name: airconsole.getNickname(device_id),
-          img: airconsole.getProfilePicture(device_id)
+          img: airconsole.getProfilePicture(device_id),
+          current_view: null,
+          class_type: 'EngineerUnit',
+          move: {
+            left: false,
+            right: false
+          },
+          unit: null,
+          default_unit: null
         };
         this.players.push(player);
         this.players_map[device_id] = player;
         this.updatePlayersMap();
-        // airconsole.sendEvent(device_id, AirConsoleService.Event.SetPlayer, {
-        //   color: color
-        // });
       };
 
       service.removePlayer = function(device_id) {

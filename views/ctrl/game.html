@@ -1,6 +1,21 @@
-<div ng-init="init()" ng-style="{ 'background': player.color }">
-  GAME
-  <button ng-click="gameOver()">Trigger Game Over</button>
+<div ng-init="init()" ng-style="{ 'background': player.color }" class="full_height">
+  <div class="top_bar">
+    <div class="btn_left">
+      <button ng-click="gameOver()">Trigger Game Over</button>
+    </div>
+    <div class="btn_right">
+      <button ng-click="onExit()">EXIT</button>
+    </div>
+  </div>
 
-  <div nd-touch="jump(true)" nd-touch-end="jump(false)">JUMP BUTTON</div>
+  <div class="btn_container">
+    <div class="btn btn_left" nd-touch="onLeft(true)" nd-touch-end="onLeft(false)">
+      <div class="btn_caption">&lt;</div>
+    </div>
+    <div class="btn btn_right" nd-touch="onRight(true)" nd-touch-end="onRight(false)">
+      <div class="btn_caption">&gt;</div>
+    </div>
+  </div>
+
+  <div class="footer_bar btn_full_width" nd-touch="onAction()">ACTION</div>
 </div>
