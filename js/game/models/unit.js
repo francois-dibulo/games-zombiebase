@@ -195,15 +195,12 @@ Unit.prototype.onVehicleJoin = function(vehicle) {
   this.body.immovable = true;
 };
 
-Unit.prototype.render = function() {
-  this.game.debug.body(this);
-};
-
 Unit.prototype.onVehicleLeave = function(vehicle) {
   var self = this;
   var angle = Phaser.Math.angleBetween(vehicle.centerX, vehicle.centerY, this.x, this.y);
   var diagonal = Phaser.Math.distance(vehicle.centerX, vehicle.centerY, vehicle.x, vehicle.y);
   var distance = this.radius + diagonal + 4;
+  console.log(vehicle, distance, diagonal);
   this.visible = true;
   this.x = vehicle.centerX + Math.cos(angle) * distance;
   this.y = vehicle.centerY + Math.sin(angle) * distance;

@@ -43,7 +43,7 @@ Tower.prototype.removeUnit = function(device_id) {
 };
 
 Tower.prototype.initWeapon = function() {
-  this.weapon = this.game.add.weapon(30, 'bullet');
+  this.weapon = this.game.add.weapon(30, 'bullet_big');
   this.weapon.bulletKillType = Phaser.Weapon.KILL_DISTANCE;
   this.weapon.bulletKillDistance = UNIT_SPECS.BULLET_DISTANCE.HIGH;
   this.weapon.fireLimit = UNIT_SPECS.AMMO.HIGH;

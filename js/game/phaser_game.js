@@ -7,6 +7,10 @@ var PhaserGame = {
   map: null,
   layer: null,
   groups: {},
+  //
+  end_countdown_init: 1,
+  end_countdown: 1,
+  end_timeout: null,
 
   init: function(airconsole, teams, mode) {
     this.airconsole = airconsole;
@@ -32,10 +36,12 @@ var PhaserGame = {
       'tower',
       'tower_canon',
       'door_h',
+      'heli',
       'helicopter_landing',
       'player',
       'enemy',
       'bullet',
+      'bullet_big',
       'item_ammo',
       'waypoint'
     ];
@@ -67,8 +73,9 @@ var PhaserGame = {
     this.addHelicopterGroup();
     this.addEnemyGroup();
     this.addItemGroup();
+    this.addHelicopter();
     this.buildPlayers();
-
+    this.startCountdown();
     this.map.setCollision([1, 2, 3, 4]);
 
     // Scale
@@ -95,6 +102,17 @@ var PhaserGame = {
     // name, gid, key, frame, exists, autoCull, group, CustomClass, adjustY
     this.map.createFromObjects('Object Layer 1', 5, 'waypoint', 0, true, false, group);
     this.groups['waypoint'] = group;
+  },
+
+  addHelicopter: function() {
+    var group = this.phaser.add.group();
+    group.classType = Helicopter;
+    var heli = new Helicopter(this.phaser, {
+      x: this.map.widthInPixels / 2 - 64,
+      y: this.map.heightInPixels + 64,
+    });
+    group.add(heli);
+    this.groups['heli'] = group;
   },
 
   addItemGroup: function() {
@@ -137,6 +155,20 @@ var PhaserGame = {
   },
 
   // =====================================================================================
+  // MECHANICS
+  // =====================================================================================
+  startCountdown: function() {
+    this.end_countdown -= 1;
+    if (this.end_countdown <= 0) {
+      var heli = this.groups['heli'].children[0];
+      var start_base = this.groups['helicopter_landing'].children[0];
+      heli.setTarget(start_base);
+    } else {
+      this.end_timeout = this.phaser.time.events.add(Phaser.Timer.SECOND * 1, this.startCountdown, this);
+    }
+  },
+
+  // =====================================================================================
   // UPDATE & RENDER
   // =====================================================================================
 
@@ -147,6 +179,26 @@ var PhaserGame = {
     var towers_group = this.groups['tower'];
     var items_group = this.groups['item'];
     var waypoints_group = this.groups['waypoint'];
+    var heli_landing_group = this.groups['helicopter_landing'];
+    var heli_group = this.groups['heli'];
+
+    // Helicopter
+    this.phaser.physics.arcade.overlap(heli_landing_group, heli_group, function(heli_landing, heli) {
+      var distance = self.phaser.physics.arcade.distanceBetween(heli_landing, heli);
+      if (heli_landing.canHeliLand() && heli.target_obj && distance < 4 && heli.isFlying()) {
+        heli.setTarget(null);
+        heli.landOnObj(heli_landing);
+      }
+    });
+
+    this.phaser.physics.arcade.overlap(heli_group, units_group, function(heli, unit) {
+      if (heli.isLanded() && unit.alive && unit.visible) {
+        var player = self.getPlayerByDeviceId(unit.device_id);
+        unit.onVehicleJoin(heli);
+        heli.onUnitJoin(unit);
+        player.unit = heli;
+      }
+    });
 
     // Units collision
     this.phaser.physics.arcade.collide(units_group, this.layer);
