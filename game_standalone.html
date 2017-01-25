@@ -3,6 +3,8 @@
   and can be done without AirConsole or Angular.
   It should basically include the same code as js/app/screen/controllers/games.js
 
+  https://github.com/mfoncho/AsyncPathingFinding
+
   TODO:
     - Unit can move into a vehicle (tower)
     - Enemy sight radius -> attack nearst unit (TODO: attack-probability)
@@ -47,6 +49,14 @@
       - Max Ammo: 30 | High Range | LOW FQ
       - Max Health: 5
       - Speed: medium
+
+    ENEMIES:
+      RUNNER: fast but runs against walls.
+      GUARD: Goes to items, towers, doors. Slow, more health
+      SCOUT: Moves randomly around.
+      INTELLIGENT: uses pathfinding to go to target. Medium speed
+
+      TARGET-PRIO: Player, ITEM, MAIN
  -->
 <!DOCTYPE HTML>
 <html>

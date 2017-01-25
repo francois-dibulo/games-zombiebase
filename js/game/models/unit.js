@@ -53,6 +53,7 @@ Unit = function (index, game, opts) {
   this.kill_timeout = null;
   this.seconds_until_kill = null;
   this.kill_start_seconds = opts.kill_countdown || UNIT_SPECS.KILL_COUTDOWN.MEDIUM;
+  this.kill_countdown_rate = opts.kill_countdown_rate || UNIT_SPECS.KILL_COUTDOWN_RATE.MEDIUM;
 
   this.inventory = [];
   this.max_inventory = 2;
@@ -114,7 +115,7 @@ Unit.prototype.killCountdown = function() {
   } else if (this.seconds_until_kill <= 0) {
     this.killUnit();
   } else {
-    var next_call = direction === 1 ? this.track_colliding_obj.data.heal_rate : Phaser.Timer.SECOND * 1;
+    var next_call = direction === 1 ? this.track_colliding_obj.data.heal_rate : this.kill_countdown_rate;
     this.text1.text = this.player_name + " (" + (this.seconds_until_kill) + ")";
     this.kill_timeout = this.game.time.events.add(next_call, this.killCountdown, this);
   }

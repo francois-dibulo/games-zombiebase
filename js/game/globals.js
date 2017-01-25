@@ -29,7 +29,12 @@ var UNIT_SPECS = {
     MEDIUM: 25,
     HIGH: 35
   },
-  // MEDIC
+  KILL_COUTDOWN_RATE: {
+    LOW: 2000,
+    MEDIUM: 1000,
+    HIGH: 500
+  },
+  // MEDIC ONLY
   HEAL_RATE: {
     LOW: 1000,
     MEDIUM: 600,
