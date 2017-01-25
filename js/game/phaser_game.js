@@ -8,6 +8,8 @@ var PhaserGame = {
   layer: null,
   groups: {},
   //
+  async_path: null,
+  //
   end_countdown_init: 1,
   end_countdown: 1,
   end_timeout: null,
@@ -67,6 +69,10 @@ var PhaserGame = {
 
     this.layer = this.map.createLayer('World');
     this.layer.resizeWorld();
+
+    this.async_path = this.phaser.plugins.add(Phaser.Plugin.asyncPath);
+    this.async_path.tileMap = this.map;
+    this.async_path.nonWalkableLayer = 'World';
 
     // Build Groups
     this.addWaypointGroup();
@@ -149,8 +155,11 @@ var PhaserGame = {
     var group = this.phaser.add.group();
     group.classType = HelicopterLanding;
     group.enableBody = true;
+    var target = this.groups['helicopter_landing'].children[0];
     for (var i = 0; i < 4; i++) {
-      group.add(new Enemy(i, this.phaser));
+      var enemy = new Enemy(i, this.phaser, {}, this.async_path);
+      group.add(enemy);
+      enemy.calculatePathToObj(target);
     }
     this.groups['enemy'] = group;
   },

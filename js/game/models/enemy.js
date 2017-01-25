@@ -1,8 +1,9 @@
-Enemy = function (index, game, opts) {
+Enemy = function (index, game, opts, async_path) {
   opts = opts || {};
   var x = opts.x || game.world.randomX;
   var y = opts.y || game.world.randomY;
   this.game = game;
+  this.async_path = async_path;
   this.radius = 8;
   this.view_radius = Phaser.Math.between(50, 100);
   this.view_radius_circle = new Phaser.Circle(x, y, this.view_radius);
@@ -61,4 +62,20 @@ Enemy.prototype.attack = function(obj) {
     this.attack_lock = now;
     obj.onHit(this);
   }
+};
+
+Enemy.prototype.calculatePathToObj = function(obj) {
+  var Block = {
+    Origin: this,
+    Destination: obj,
+    Diagonals: true,
+    debugpath: true,
+    found: function(path) {
+      console.log(path);
+    },
+    notfound: function() {
+      console.log('No path found');
+    }
+  };
+  this.async_path.getPath(Block);
 };
