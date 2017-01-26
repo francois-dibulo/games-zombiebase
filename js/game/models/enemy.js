@@ -69,7 +69,7 @@ Enemy.prototype.calculatePathToObj = function(obj) {
     Origin: this,
     Destination: obj,
     Diagonals: true,
-    debugpath: true,
+    debugpath: false,
     found: function(path) {
       console.log(path);
     },

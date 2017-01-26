@@ -5,6 +5,7 @@
  *  sprite_key
  *  init_health
  *  bullet_kill_distance
+ *  kill_countdown_rate
  *  fire_limit
  *  fire_rate
  *  move_speed
@@ -201,7 +202,6 @@ Unit.prototype.onVehicleLeave = function(vehicle) {
   var angle = Phaser.Math.angleBetween(vehicle.centerX, vehicle.centerY, this.x, this.y);
   var diagonal = Phaser.Math.distance(vehicle.centerX, vehicle.centerY, vehicle.x, vehicle.y);
   var distance = this.radius + diagonal + 4;
-  console.log(vehicle, distance, diagonal);
   this.visible = true;
   this.x = vehicle.centerX + Math.cos(angle) * distance;
   this.y = vehicle.centerY + Math.sin(angle) * distance;
@@ -234,4 +234,3 @@ Unit.prototype.toCustomData = function() {
     ammo: this.getShotsLeft()
   };
 };
-

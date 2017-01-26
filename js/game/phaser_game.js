@@ -10,14 +10,13 @@ var PhaserGame = {
   //
   async_path: null,
   //
-  end_countdown_init: 1,
-  end_countdown: 1,
+  end_countdown_init: 20,
+  end_countdown: 20,
   end_timeout: null,
 
   init: function(airconsole, teams, mode) {
     this.airconsole = airconsole;
     this.teams = teams;
-    console.log(this.teams);
     this.mode = mode;
     this.phaser = new Phaser.Game(1120, 800, Phaser.AUTO, 'phaser-container', {
       preload: this.preload.bind(this),
