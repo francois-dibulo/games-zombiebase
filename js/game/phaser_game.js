@@ -13,6 +13,8 @@ var PhaserGame = {
   end_countdown_init: 20,
   end_countdown: 20,
   end_timeout: null,
+  //
+  enemy_handler: null,
 
   init: function(airconsole, teams, mode) {
     this.airconsole = airconsole;
@@ -79,8 +81,8 @@ var PhaserGame = {
     this.addHelicopterGroup();
     this.addEnemyGroup();
     this.addItemGroup();
-    this.addHelicopter();
     this.buildPlayers();
+    this.addHelicopter();
     this.startCountdown();
     this.map.setCollision([1, 2, 3, 4]);
 
@@ -152,15 +154,14 @@ var PhaserGame = {
 
   addEnemyGroup: function() {
     var group = this.phaser.add.group();
-    group.classType = HelicopterLanding;
+    group.classType = Enemy;
     group.enableBody = true;
-    var target = this.groups['helicopter_landing'].children[0];
-    for (var i = 0; i < 4; i++) {
-      var enemy = new Enemy(i, this.phaser, {}, this.async_path);
-      group.add(enemy);
-      enemy.calculatePathToObj(target);
-    }
     this.groups['enemy'] = group;
+    this.enemy_handler = new EnemyHandler(this.phaser, this.groups, this.async_path);
+    //
+    for (var i = 0; i < 4; i++) {
+      this.enemy_handler.createEnemy();
+    }
   },
 
   // =====================================================================================
@@ -279,42 +280,8 @@ var PhaserGame = {
     }, this);
 
     // Enemies
-    this.phaser.physics.arcade.collide(enemies_group, enemies_group);
     this.phaser.physics.arcade.collide(enemies_group, this.layer);
-
-    this.phaser.physics.arcade.collide(enemies_group, waypoints_group, function(enemy, wp) {
-      // if (enemy.target_obj === wp) {
-      //   enemy.visited_waypoints.push(wp);
-      // }
-    });
-    // Enemy view radius
-    enemies_group.forEach(function(enemy) {
-      var main_target = this.groups['helicopter_landing'].children[0];
-      units_group.forEach(function(unit) {
-        if (unit.alive && unit.visible && enemy.alive) {
-          var distance = Phaser.Math.distance(unit.x, unit.y, enemy.x, enemy.y);
-          if (distance < enemy.view_radius &&
-            ((enemy.target_obj && enemy.target_obj.device_id !== unit.device_id) || !enemy.target_obj )) {
-            enemy.moveTo(unit);
-          }
-          if (distance > enemy.view_radius * 2 &&
-              (enemy.target_obj && enemy.target_obj.device_id === unit.device_id)) {
-            enemy.moveTo(main_target);
-          }
-        }
-      }, this);
-
-      // Move to main object if it has no target
-      if (!enemy.target_obj) {
-        var closest_wp = waypoints_group.getClosestTo(enemy, function(wp, distance) {
-
-        });
-        if (!closest_wp) {
-          closest_wp = main_target;
-        }
-        enemy.moveTo(closest_wp);
-      }
-    }, this);
+    this.enemy_handler.update(enemies_group, this.groups);
   },
 
   render: function () {
@@ -342,7 +309,6 @@ var PhaserGame = {
 
   buildPlayers: function() {
     var teams = this.teams;
-    //this.objects['unit'] = [];
     var group = this.phaser.add.group();
     var start_base = this.groups['waypoint'].children[0];
     for (var i = 0; i < this.teams.length; i++) {
@@ -358,7 +324,6 @@ var PhaserGame = {
           y: start_base.y + 16 * p
         };
         var unit = new window[player.class_type](p, this.phaser, opts);
-        console.log("UNIT", unit);
         player.unit = unit;
         player.default_unit = unit;
         group.add(unit);
