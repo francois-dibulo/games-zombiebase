@@ -52,3 +52,11 @@
   background-color: #47C12D;
 }
 
+
+.btn_select_class_type {
+  width: 25%;
+}
+
+.btn_select_class_type.active {
+  color: green;
+}

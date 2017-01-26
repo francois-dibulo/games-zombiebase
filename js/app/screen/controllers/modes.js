@@ -19,7 +19,7 @@ App.controllers.controller('ModesCtrl', ['$scope', '$location', 'GameModesServic
       if (mode.is_team) {
         ViewService.screen.go('select_team', true);
       } else {
-        ViewService.screen.go('game', true);
+        ViewService.screen.go('select_class', true);
       }
       $scope.$apply();
     };

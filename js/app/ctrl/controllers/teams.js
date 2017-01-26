@@ -26,8 +26,8 @@ App.controllers.controller('TeamsCtrl', ['$scope', '$location', 'ViewService', '
     ViewService.ctrl.go('select_mode', true);
   };
 
-  $scope.startGame = function() {
-    ViewService.ctrl.go('game', true);
+  $scope.nextView = function() {
+    ViewService.ctrl.go('select_class', true);
   };
 
 }]);

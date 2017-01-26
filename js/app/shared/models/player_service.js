@@ -3,7 +3,12 @@ App.services.factory('PlayerService', ['AirConsoleService', function (AirConsole
     ctrl: {},
     screen: {},
     players: [],
-    players_map: {}
+    players_map: {},
+    device_player: null
+  };
+
+  var Event = {
+    PlayerUpdate: 'on_update_player'
   };
 
   // ======================================================
@@ -29,7 +34,7 @@ App.services.factory('PlayerService', ['AirConsoleService', function (AirConsole
 
       var player_map_key = 'player_map_key';
 
-      service.updatePlayersMap = function() {
+      service.updatePlayersMap = function(no_broadcast) {
         var formated_map = {};
         for (var device_id in this.players_map) {
           var player = this.players_map[device_id];
@@ -45,7 +50,9 @@ App.services.factory('PlayerService', ['AirConsoleService', function (AirConsole
             move: player.move
           }
         };
-        airconsole.setCustomDeviceStateProperty(player_map_key, formated_map);
+        if (!no_broadcast) {
+          airconsole.setCustomDeviceStateProperty(player_map_key, formated_map);
+        }
       };
       service.updatePlayersMap();
 
@@ -102,10 +109,23 @@ App.services.factory('PlayerService', ['AirConsoleService', function (AirConsole
         service.addPlayer(device_id);
       });
 
+      airconsole.on(Event.PlayerUpdate, function(device_id, params) {
+        var player = service.players_map[device_id];
+        if (player) {
+          _.merge(player, params);
+        }
+      });
+
     // ======================================================
     // CTRL
     // ======================================================
     } else {
+
+      service.updatePlayerProperty = function(key, value) {
+        var data = {};
+        data[key] = value;
+        airconsole.sendEvent(AirConsole.SCREEN, Event.PlayerUpdate, data);
+      };
 
     }
 

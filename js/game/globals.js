@@ -41,3 +41,26 @@ var UNIT_SPECS = {
     HIGH: 400
   }
 };
+
+var UNITS = {
+  "MedicUnit" : {
+    name: "Medic",
+    class_type: "MedicUnit",
+    description: "Can heal other players"
+  },
+  "EngineerUnit": {
+    name: "Engineer",
+    class_type: "EngineerUnit",
+    description: "Can repair stuff"
+  },
+  "SoldierUnit": {
+    name: "Soldier",
+    class_type: "SoldierUnit",
+    description: "Increased combat skills"
+  },
+  "PilotUnit": {
+    name: "Pilot",
+    class_type: "PilotUnit",
+    description: "Can Fly"
+  }
+};

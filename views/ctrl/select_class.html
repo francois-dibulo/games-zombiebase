@@ -1,0 +1,22 @@
+<div ng-init="init()" class="full_height">
+
+  <div class="top_bar">SELECT A CLASS</div>
+
+  <div class="btn_container">
+    <div ng-repeat="(key, class) in available_classes"
+        nd-touch="selectClass(class)"
+        class="btn_left btn btn_select_class_type"
+        ng-class="{active: isSelectedClass(class.class_type) }">
+      <div class="btn_caption">{{ class.name }}<br>{{ class.description }}</div>
+    </div>
+  </div>
+
+  <div class="footer_bar btn_full_width" nd-touch="startGame()" ng-show="player.is_master">
+    STAR GAME
+  </div>
+
+  <div ng-hide="player.is_master">
+    Wait for master to start game
+  </div>
+
+</div>

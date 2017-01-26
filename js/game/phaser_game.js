@@ -358,6 +358,7 @@ var PhaserGame = {
           y: start_base.y + 16 * p
         };
         var unit = new window[player.class_type](p, this.phaser, opts);
+        console.log("UNIT", unit);
         player.unit = unit;
         player.default_unit = unit;
         group.add(unit);

@@ -13,6 +13,10 @@ App.app.config(['$routeProvider',
         templateUrl: 'views/ctrl/select_team.html',
         controller: 'TeamsCtrl'
       }).
+      when('/select_class', {
+        templateUrl: 'views/ctrl/select_class.html',
+        controller: 'ClassTypesCtrl'
+      }).
       when('/game', {
         templateUrl: 'views/ctrl/game.html',
         controller: 'GamesCtrl'

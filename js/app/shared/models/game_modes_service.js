@@ -6,15 +6,15 @@ App.services.factory('GameModesService', ['AirConsoleService', function (AirCons
   service.current_selected_mode_index = 0;
   service.modes = [
     {
-      name: 'Classic Mode',
-      key: 'classic',
-      description: 'A classic mode',
+      name: 'COOP',
+      key: 'coop',
+      description: 'Play together against the enemy',
       instructions: 'Get to the green zone',
       ctrl_view: 'game'
     },
     {
-      name: 'Hard Mode',
-      key: 'hard',
+      name: 'Team vs Team',
+      key: 'tvt',
       description: 'A much harder game mode',
       instructions: 'Get to the green and yellow zones',
       is_team: true,
