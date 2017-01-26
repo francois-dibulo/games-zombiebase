@@ -45,9 +45,10 @@ Enemy.prototype.update = function() {
   }
 };
 
-Enemy.prototype.onHit = function() {
+Enemy.prototype.onHit = function(bullet) {
   this.damage(1);
   console.log("HIT", this.health);
+  return this.health === 0;
 };
 
 Enemy.prototype.moveTo = function(obj) {

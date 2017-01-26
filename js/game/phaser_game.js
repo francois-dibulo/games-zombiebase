@@ -3,6 +3,7 @@ var PhaserGame = {
   mode: null,
   airconsole: null,
   teams: null,
+  player_map: {},
   phaser: null,
   map: null,
   layer: null,
@@ -192,8 +193,11 @@ var PhaserGame = {
     var heli_landing_group = this.groups['helicopter_landing'];
     var heli_group = this.groups['heli'];
 
+    var collide = this.phaser.physics.arcade.collide.bind(this.phaser.physics.arcade);
+    var overlap = this.phaser.physics.arcade.overlap.bind(this.phaser.physics.arcade);
+
     // Helicopter
-    this.phaser.physics.arcade.overlap(heli_landing_group, heli_group, function(heli_landing, heli) {
+    overlap(heli_landing_group, heli_group, function(heli_landing, heli) {
       var distance = self.phaser.physics.arcade.distanceBetween(heli_landing, heli);
       if (heli_landing.canHeliLand() && heli.target_obj && distance < 4 && heli.isFlying()) {
         heli.setTarget(null);
@@ -201,7 +205,7 @@ var PhaserGame = {
       }
     });
 
-    this.phaser.physics.arcade.overlap(heli_group, units_group, function(heli, unit) {
+    overlap(heli_group, units_group, function(heli, unit) {
       if (heli.isLanded() && unit.alive && unit.visible) {
         var player = self.getPlayerByDeviceId(unit.device_id);
         unit.onVehicleJoin(heli);
@@ -211,28 +215,28 @@ var PhaserGame = {
     });
 
     // Units collision
-    this.phaser.physics.arcade.collide(units_group, this.layer);
-    this.phaser.physics.arcade.collide(units_group, units_group, function(unit, other_unit) {
+    collide(units_group, this.layer);
+    collide(units_group, units_group, function(unit, other_unit) {
       if (unit.visible && other_unit.visible) {
         other_unit.collidesWithUnit(unit);
         unit.collidesWithUnit(other_unit);
       }
     });
-    this.phaser.physics.arcade.collide(units_group, enemies_group, function(unit, enemy) {
+    collide(units_group, enemies_group, function(unit, enemy) {
       if (unit.visible) {
         enemy.attack(unit);
       }
     });
-    this.phaser.physics.arcade.collide(units_group, towers_group, function(unit, tower) {
+    collide(units_group, towers_group, function(unit, tower) {
       if (tower.canUnitJoin() && unit.alive) {
-        var player = self.getPlayerByDeviceId(unit.device_id);
+        var player = self.player_map[unit.device_id];
         unit.onVehicleJoin(tower);
         tower.addUnit(unit);
         player.unit = tower;
       }
     });
 
-    this.phaser.physics.arcade.collide(units_group, items_group, function(unit, item) {
+    collide(units_group, items_group, function(unit, item) {
       if (unit.canCollect(item)) {
         unit.collectItem(item);
         item.kill();
@@ -243,18 +247,20 @@ var PhaserGame = {
     units_group.forEach(function(unit) {
       var bullets = unit.weapon.bullets;
 
-      this.phaser.physics.arcade.collide(bullets, this.layer, function(bullet, obj) {
+      collide(bullets, this.layer, function(bullet, obj) {
         bullet.kill();
       });
 
-      this.phaser.physics.arcade.collide(bullets, enemies_group, function(bullet, obj) {
+      collide(bullets, enemies_group, function(bullet, obj) {
         if (obj.alive) {
+          if (obj.onHit(bullet)) {
+            self.increasePlayerStats(unit.device_id, 'enemy_kills');
+          }
           bullet.kill();
-          obj.onHit(bullet);
         }
       });
 
-      this.phaser.physics.arcade.collide(bullets, units_group, function(bullet, other_unit) {
+      collide(bullets, units_group, function(bullet, other_unit) {
         if (other_unit.alive) {
           other_unit.onHit(bullet);
           bullet.kill();
@@ -265,13 +271,13 @@ var PhaserGame = {
     // Tower Bullets
     towers_group.forEach(function(tower) {
       var bullets = tower.weapon.bullets;
-      this.phaser.physics.arcade.collide(bullets, enemies_group, function(bullet, obj) {
+      collide(bullets, enemies_group, function(bullet, obj) {
         if (obj.alive) {
           bullet.kill();
           obj.onHit(bullet);
         }
       });
-      this.phaser.physics.arcade.collide(bullets, units_group, function(bullet, obj) {
+      collide(bullets, units_group, function(bullet, obj) {
         if (obj.alive) {
           bullet.kill();
           obj.onHit(bullet);
@@ -280,7 +286,7 @@ var PhaserGame = {
     }, this);
 
     // Enemies
-    this.phaser.physics.arcade.collide(enemies_group, this.layer);
+    collide(enemies_group, this.layer);
     this.enemy_handler.update(enemies_group, this.groups);
   },
 
@@ -327,6 +333,7 @@ var PhaserGame = {
         player.unit = unit;
         player.default_unit = unit;
         group.add(unit);
+        this.player_map[player.device_id] = player;
         unit.update_device_signal.add(this.updateCustomDeviceData, this);
       }
     }
@@ -359,23 +366,29 @@ var PhaserGame = {
 
   updateCustomDeviceData: function(unit) {
     var custom_data = {};
-    for (var i = 0; i < this.teams.length; i++) {
-      var players = this.teams[i].players;
-      for (var p = 0; p < players.length; p++) {
-        var player = players[p];
-        var unit = player.default_unit;
-        var opts = {
-          name: player.name,
-          color: player.color,
-          current_view: player.current_view,
-          class_type: player.class_type,
-          stats: player.stats,
-          unit: unit.toCustomData()
-        };
-        custom_data[player.device_id] = opts;
-      }
-    }
+    var player = this.player_map[unit.device_id];
+    var unit = player.default_unit;
+    var opts = {
+      name: player.name,
+      color: player.color,
+      current_view: player.current_view,
+      class_type: player.class_type,
+      stats: player.stats,
+      unit: unit.toCustomData()
+    };
+    custom_data[player.device_id] = opts;
     this.airconsole.setCustomDeviceStateProperty('players', custom_data);
   },
+
+  increasePlayerStats: function(device_id, key, step) {
+    var player = this.player_map[device_id];
+    var step = step || 1;
+    if (player) {
+      if (!player.stats[key]) {
+        player.stats[key] = 0;
+      }
+      player.stats[key] = player.stats[key] + step;
+    }
+  }
 
 };
