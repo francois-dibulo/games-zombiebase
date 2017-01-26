@@ -334,6 +334,7 @@ var PhaserGame = {
         player.default_unit = unit;
         group.add(unit);
         this.player_map[player.device_id] = player;
+        this.updateCustomDeviceData(player.device_id);
         unit.update_device_signal.add(this.updateCustomDeviceData, this);
       }
     }
@@ -364,20 +365,21 @@ var PhaserGame = {
     }
   },
 
-  updateCustomDeviceData: function(unit) {
+  updateCustomDeviceData: function(device_id) {
     var custom_data = {};
-    var player = this.player_map[unit.device_id];
+    var player = this.player_map[device_id];
     var unit = player.default_unit;
     var opts = {
-      name: player.name,
-      color: player.color,
+      //name: player.name,
+      //color: player.color,
       current_view: player.current_view,
-      class_type: player.class_type,
+      //class_type: player.class_type,
       stats: player.stats,
       unit: unit.toCustomData()
     };
-    custom_data[player.device_id] = opts;
-    this.airconsole.setCustomDeviceStateProperty('players', custom_data);
+    //custom_data[device_id] = opts;
+    this.airconsole.sendEvent(device_id, 'on_update_player', opts);
+    //this.airconsole.setCustomDeviceStateProperty('players', custom_data);
   },
 
   increasePlayerStats: function(device_id, key, step) {

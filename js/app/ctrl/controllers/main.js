@@ -3,7 +3,9 @@ App.controllers.controller('MainCtrl', ['$scope', '$location', '$http', 'AirCons
   $scope.airconsole = null;
   $scope.player = {
     device_id: null,
-    is_master: false
+    is_master: false,
+    stats: {},
+    unit: {}
   };
 
   var setMasterPlayer = function() {

@@ -162,8 +162,8 @@ Unit.prototype.onHit = function(obj) {
     this.setInjured();
   } else if (!this.kill_timeout) {
     this.damage(1);
+    this.update_device_signal.dispatch(this.device_id);
   }
-  this.update_device_signal.dispatch();
 };
 
 Unit.prototype.onMove = function(data) {

@@ -1,5 +1,6 @@
-App.controllers.controller('GamesCtrl', ['$scope', '$location', 'ViewService', 'AirConsoleService', function ($scope, $location, ViewService, AirConsoleService) {
-
+App.controllers.controller('GamesCtrl', ['$scope', '$location', 'ViewService', 'AirConsoleService', 'PlayerService', function ($scope, $location, ViewService, AirConsoleService, PlayerService) {
+  var airconsole = AirConsoleService.airconsole;
+  var evts = {};
   var move = {
     left: false,
     right: false
@@ -38,15 +39,31 @@ App.controllers.controller('GamesCtrl', ['$scope', '$location', 'ViewService', '
     });
   };
 
+  $scope.gameOver = function() {
+    ViewService.ctrl.go('game_over', true);
+  };
+
   $scope.goToModeSelection = function() {
     ViewService.ctrl.go('select_mode', true);
   };
 
   $scope.init = function() {
+
+    evts.on_update_player = airconsole.on('on_update_player', function(device_id, params) {
+      for (var prop in params) {
+        $scope.player[prop] = params[prop];
+      }
+      console.log($scope.player);
+      $scope.$apply();
+    });
+
   };
 
-  $scope.gameOver = function() {
-    ViewService.ctrl.go('game_over', true);
-  };
+
+  $scope.$on("$destroy", function() {
+    for (var key in evts) {
+      airconsole.off(evts[key]);
+    }
+  });
 
 }]);
