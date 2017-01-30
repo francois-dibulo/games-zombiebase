@@ -319,20 +319,27 @@ var PhaserGame = {
     //
     var start_base = this.groups['waypoint'].children[0];
     var angle = 0;
+    var start_margin = 32;
     //
     for (var i = 0; i < teams.length; i++) {
       var players = teams[i].players;
       var angle_step = (Math.PI * 2) / players.length;
       for (var p = 0; p < players.length; p++) {
         var player = players[p];
+        var start_x = start_base.centerX + Math.cos(angle_step * p) * start_margin;
+        var start_y = start_base.centerY + Math.sin(angle_step * p) * start_margin;
         var opts = {
           device_id: player.device_id,
           color: player.color,
           label: player.name,
-          x: start_base.centerX + Math.cos(angle_step * p) * 32,
-          y: start_base.centerY + Math.sin(angle_step * p) * 32
+          x: start_x,
+          y: start_y
         };
         var unit = new window[player.class_type](p, this.phaser, opts);
+
+        var start_rotation = this.phaser.physics.arcade.angleToXY(unit, start_base.centerX, start_base.centerY);
+        unit.rotation = Phaser.Math.reverseAngle(start_rotation);
+
         player.unit = unit;
         player.default_unit = unit;
         group.add(unit);
