@@ -1,0 +1,3 @@
+[submodule "js/libs/airconsole-events"]
+	path = js/libs/airconsole-events
+	url = git@github.com:AirConsole/airconsole-events.git
