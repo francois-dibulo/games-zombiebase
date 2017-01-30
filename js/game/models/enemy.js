@@ -23,7 +23,10 @@ Enemy = function (index, game, opts, async_path) {
   this.angular_move_velocity = 100;
   this.setHealth(3);
 
+  this.overlaps_main_target = false;
+  this.main_target_obj = null;
   this.target_obj = null;
+  this.tween_to = null;
 
   this.attack_lock = null;
   this.attack_rate = 1000;
@@ -51,8 +54,41 @@ Enemy.prototype.onHit = function(bullet) {
   return this.health === 0;
 };
 
-Enemy.prototype.moveTo = function(obj) {
+Enemy.prototype.setTargetObj = function(obj) {
   this.target_obj = obj;
+};
+
+Enemy.prototype.moveToPoint_ = function(x, y) {
+  this.target_obj = null;
+  if (this.tween_to) {
+    this.stopTweenTo();
+  }
+  //
+  var distance = Phaser.Math.distance(this.x, this.y, x, y);
+  var duration = Math.round(this.move_speed * distance * 10);
+  //
+  this.tween_to = this.game.add.tween(this).to( { y: y, x: x }, duration, Phaser.Easing.Linear.In, true);
+  this.rotation = this.game.physics.arcade.angleToXY(this, x, y);
+  this.tween_to.onComplete.add(function() {
+    this.body.velocity.x = 0;
+    this.body.velocity.y = 0;
+  }, this);
+};
+
+Enemy.prototype.stopTweenTo = function() {
+  if (this.tween_to) {
+    this.tween_to.stop();
+  }
+};
+
+Enemy.prototype.moveToMainTarget = function() {
+  //TODO: here we can use either direct path or path calculated by pathfinding
+  var radius = Phaser.Math.between(5, this.main_target_obj.width);
+  var angle = Phaser.Math.between(0, 360);
+  var rad = Phaser.Math.degToRad(angle);
+  var x = this.main_target_obj.x + Math.cos(rad) * radius;
+  var y = this.main_target_obj.y + Math.sin(rad) * radius;
+  this.moveToPoint_(x, y);
 };
 
 Enemy.prototype.attack = function(obj) {

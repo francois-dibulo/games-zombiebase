@@ -10,7 +10,7 @@ EnemyHandler.prototype = {
     return this.groups['enemy'];
   },
 
-  createEnemy: function() {
+  createEnemy: function(main_target_obj) {
     var group = this.getGroup();
     var enemy = group.getFirstDead();
     if (!enemy) {
@@ -19,16 +19,23 @@ EnemyHandler.prototype = {
     } else {
       item.reset();
     }
+
+    if (main_target_obj) {
+      enemy.main_target_obj = main_target_obj;
+    }
+
     return enemy;
   },
 
   update: function(enemies_group, groups) {
     var units_group = groups['unit'];
-    var main_target = groups['helicopter_landing'].children[0];
 
     this.phaser.physics.arcade.collide(enemies_group, enemies_group);
+    this.phaser.physics.arcade.collide(enemies_group, groups['tower']);
 
     enemies_group.forEach(function(enemy) {
+
+      var current_target = null;
 
       // Collides with Unit
       units_group.forEach(function(unit) {
@@ -36,24 +43,38 @@ EnemyHandler.prototype = {
           var distance = Phaser.Math.distance(unit.x, unit.y, enemy.x, enemy.y);
           if (distance < enemy.view_radius &&
             ((enemy.target_obj && enemy.target_obj.device_id !== unit.device_id) || !enemy.target_obj )) {
-            enemy.moveTo(unit);
+            current_target = unit;
+            enemy.stopTweenTo();
           }
           if (distance > enemy.view_radius * 2 &&
               (enemy.target_obj && enemy.target_obj.device_id === unit.device_id)) {
-            enemy.moveTo(main_target);
+            current_target = enemy.main_target_obj;
           }
         }
       }, this);
 
-      // Move to main object if it has no target
-      if (!enemy.target_obj) {
-        // enemy.calculatePathToObj(target);
-        var closest_wp = null;
-        if (!closest_wp) {
-          closest_wp = main_target;
+      // Has no current target
+      if (enemy.main_target_obj && !enemy.target_obj) {
+        if (!current_target) {
+          //
+          var overlaps = false;
+          // Collides with main target
+          this.phaser.physics.arcade.overlap(enemy, enemy.main_target_obj, function(enemy, main_obj) {
+            overlaps = true;
+          });
+          if (overlaps) {
+            if (!enemy.overlaps_main_target) {
+              enemy.moveToMainTarget();
+            }
+            current_target = null;
+          } else {
+            current_target = enemy.main_target_obj;
+          }
+          enemy.overlaps_main_target = overlaps;
         }
-        enemy.moveTo(closest_wp);
       }
+
+      enemy.setTargetObj(current_target);
     }, this);
 
   }

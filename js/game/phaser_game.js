@@ -160,8 +160,9 @@ var PhaserGame = {
     this.groups['enemy'] = group;
     this.enemy_handler = new EnemyHandler(this.phaser, this.groups, this.async_path);
     //
-    for (var i = 0; i < 4; i++) {
-      this.enemy_handler.createEnemy();
+    var main_target = this.groups['helicopter_landing'].children[0];
+    for (var i = 0; i < 6; i++) {
+      this.enemy_handler.createEnemy(main_target);
     }
   },
 
@@ -189,7 +190,6 @@ var PhaserGame = {
     var enemies_group = this.groups['enemy'];
     var towers_group = this.groups['tower'];
     var items_group = this.groups['item'];
-    var waypoints_group = this.groups['waypoint'];
     var heli_landing_group = this.groups['helicopter_landing'];
     var heli_group = this.groups['heli'];
 
@@ -316,18 +316,21 @@ var PhaserGame = {
   buildPlayers: function() {
     var teams = this.teams;
     var group = this.phaser.add.group();
+    //
     var start_base = this.groups['waypoint'].children[0];
-    for (var i = 0; i < this.teams.length; i++) {
-      //var start_base = this.groups['waypoint'].children[i];
-      var players = this.teams[i].players;
+    var angle = 0;
+    //
+    for (var i = 0; i < teams.length; i++) {
+      var players = teams[i].players;
+      var angle_step = (Math.PI * 2) / players.length;
       for (var p = 0; p < players.length; p++) {
         var player = players[p];
         var opts = {
           device_id: player.device_id,
           color: player.color,
           label: player.name,
-          x: start_base.x + 16 * p,
-          y: start_base.y + 16 * p
+          x: start_base.centerX + Math.cos(angle_step * p) * 32,
+          y: start_base.centerY + Math.sin(angle_step * p) * 32
         };
         var unit = new window[player.class_type](p, this.phaser, opts);
         player.unit = unit;
