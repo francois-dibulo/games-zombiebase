@@ -31,6 +31,9 @@ Enemy = function (index, game, opts, async_path) {
   this.attack_lock = null;
   this.attack_rate = 1000;
 
+  this.can_climbe = true;
+  this.climb_wall_time = Phaser.Math.between(15, 60) * 1000;
+  this.pass_wall_collide = false;
   game.add.existing(this);
 };
 
@@ -99,6 +102,36 @@ Enemy.prototype.attack = function(obj) {
     this.attack_lock = now;
     obj.onHit(this);
   }
+};
+
+Enemy.prototype.collidesWithWall = function(wall) {
+  if (!this.collide_wall_timeout && (Math.abs(this.body.velocity.x) < 2 && Math.abs(this.body.velocity.y) < 2)) {
+    console.log("START TIMER", this.climb_wall_time);
+    this.collide_wall_timeout = this.game.time.events.add(this.climb_wall_time, this.climbWall, this);
+  }
+};
+
+Enemy.prototype.abortClimbWall = function() {
+  if (this.collide_wall_timeout) {
+    console.log("ABORT TIMER");
+    this.game.time.events.add(200, function() {
+      this.game.time.events.remove(this.collide_wall_timeout);
+      this.collide_wall_timeout = null;
+    }, this);
+  }
+};
+
+Enemy.prototype.climbWall = function() {
+  this.pass_wall_collide = true;
+  this.collide_wall_timeout = null;
+  var tween = this.game.add.tween(this.scale).to( { x: 1.2, y: 1.2 }, 400, Phaser.Easing.Back.Out, true, 0);
+};
+
+Enemy.prototype.leaveWall = function() {
+  console.log("LEAVE WALL");
+  this.abortClimbWall();
+  this.pass_wall_collide = false;
+  var tween = this.game.add.tween(this.scale).to({ x: 1, y: 1 }, 400, Phaser.Easing.Back.In, true, 0);
 };
 
 Enemy.prototype.calculatePathToObj = function(obj) {

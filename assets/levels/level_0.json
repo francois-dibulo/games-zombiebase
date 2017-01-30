@@ -119,6 +119,22 @@
          "spacing":0,
          "tilecount":1,
          "tileheight":16,
+         "tileproperties":
+            {
+             "0":
+                {
+                 "can_climbe":true,
+                 "type":"wall"
+                }
+            },
+         "tilepropertytypes":
+            {
+             "0":
+                {
+                 "can_climbe":"bool",
+                 "type":"string"
+                }
+            },
          "tilewidth":16,
          "transparentcolor":"#5eff19"
         }, 

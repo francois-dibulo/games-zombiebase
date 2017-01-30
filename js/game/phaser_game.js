@@ -286,8 +286,7 @@ var PhaserGame = {
     }, this);
 
     // Enemies
-    collide(enemies_group, this.layer);
-    this.enemy_handler.update(enemies_group, this.groups);
+    this.enemy_handler.update(enemies_group, this.groups, this.layer);
   },
 
   render: function () {

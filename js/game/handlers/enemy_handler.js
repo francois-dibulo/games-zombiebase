@@ -27,15 +27,39 @@ EnemyHandler.prototype = {
     return enemy;
   },
 
-  update: function(enemies_group, groups) {
+  update: function(enemies_group, groups, map_layer) {
     var units_group = groups['unit'];
+    var self = this;
 
-    this.phaser.physics.arcade.collide(enemies_group, enemies_group);
-    this.phaser.physics.arcade.collide(enemies_group, groups['tower']);
+    var collide = this.phaser.physics.arcade.collide.bind(this.phaser.physics.arcade);
+
+    collide(enemies_group, enemies_group);
+    collide(enemies_group, groups['tower']);
 
     enemies_group.forEach(function(enemy) {
 
       var current_target = null;
+
+      // Collides with wall tile? Climb it
+      if (enemy.can_climbe) {
+        var is_touching_wall = false;
+        collide(enemy, map_layer, function(enemy, item) {
+          enemy.collidesWithWall(item);
+        }, function(enemy, item) {
+          var state = false;
+          if (item.properties.type === 'wall' && item.properties.can_climbe) {
+            is_touching_wall = true;
+            if (enemy.pass_wall_collide === false) {
+              state = true;
+            }
+          }
+          return state;
+        });
+
+        if (!is_touching_wall && enemy.pass_wall_collide === true) {
+          enemy.leaveWall();
+        }
+      }
 
       // Collides with Unit
       units_group.forEach(function(unit) {
@@ -44,6 +68,7 @@ EnemyHandler.prototype = {
           if (distance < enemy.view_radius &&
             ((enemy.target_obj && enemy.target_obj.device_id !== unit.device_id) || !enemy.target_obj )) {
             current_target = unit;
+            enemy.abortClimbWall();
             enemy.stopTweenTo();
           }
           if (distance > enemy.view_radius * 2 &&
