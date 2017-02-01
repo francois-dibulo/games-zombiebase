@@ -71,9 +71,9 @@ EnemyHandler.prototype = {
         if (item.alive && item.visible) {
           var distance = Phaser.Math.distance(item.x, item.y, enemy.x, enemy.y);
           if (distance < enemy.view_radius) {
-            if (enemy.target_obj) {
-              var prio_item = enemy.target_prio.indexOf(item.name);
-              var prio_current = enemy.target_prio.indexOf(enemy.target_obj.name);
+            if (enemy.target_obj && enemy.target_obj.name) {
+              var prio_item = enemy.target_prio[item.name];
+              var prio_current = enemy.target_prio[enemy.target_obj.name];
               if (prio_item < prio_current) {
                 current_target = item;
               }

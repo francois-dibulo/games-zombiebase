@@ -28,7 +28,10 @@ Enemy = function (index, game, opts, async_path) {
   this.target_obj = null;
   this.tween_to = null;
 
-  this.target_prio = ['Unit', 'generator'];
+  this.target_prio = {
+    'Unit': 0,
+    'generator': 1
+  };
   this.attack_lock = null;
   this.attack_rate = 1000;
 
