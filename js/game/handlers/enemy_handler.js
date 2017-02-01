@@ -66,6 +66,24 @@ EnemyHandler.prototype = {
         collide(enemy, map_layer);
       }
 
+      // Collides with Item
+      groups['item'].forEach(function(item) {
+        if (item.alive && item.visible) {
+          var distance = Phaser.Math.distance(item.x, item.y, enemy.x, enemy.y);
+          if (distance < enemy.view_radius) {
+            if (enemy.target_obj) {
+              var prio_item = enemy.target_prio.indexOf(item.name);
+              var prio_current = enemy.target_prio.indexOf(enemy.target_obj.name);
+              if (prio_item < prio_current) {
+                current_target = item;
+              }
+            } else {
+              current_target = item;
+            }
+          }
+        }
+      });
+
       // Collides with Unit
       units_group.forEach(function(unit) {
         if (unit.alive && unit.visible && enemy.alive) {

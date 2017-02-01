@@ -25,6 +25,7 @@ Unit = function (index, game, opts) {
 
   Phaser.Sprite.call(this, game, x, y, opts.sprite_key || 'player');
   this.unit_type = 'Unit';
+  this.name = "Unit";
 
   this.anchor.setTo(0.5, 0.5);
   game.physics.enable(this, Phaser.Physics.ARCADE);
