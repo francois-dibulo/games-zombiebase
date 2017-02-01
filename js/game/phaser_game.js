@@ -131,7 +131,7 @@ var PhaserGame = {
     group.enableBody = true;
     // name, gid, key, frame, exists, autoCull, group, CustomClass, adjustY
     this.map.createFromObjects('Object Layer 1', 4, 'item_ammo', 0, true, false, group, Item);
-    this.map.createFromObjects('Object Layer 1', 6, 'generator', 0, true, false, group, Item);
+    this.map.createFromObjects('Object Layer 1', 6, 'generator', 0, true, false, group, GeneratorItem);
     this.groups['item'] = group;
 
     //var item = group.getRandom();

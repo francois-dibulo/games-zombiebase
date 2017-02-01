@@ -79,7 +79,7 @@ Unit.prototype = Object.create(Phaser.Sprite.prototype);
 Unit.prototype.constructor = Unit;
 
 Unit.prototype.update = function() {
-  this.text1.alignTo(this, Phaser.CENTER_TOP, 16);
+  this.text1.alignTo(this, Phaser.TOP_CENTER);
   this.game.physics.arcade.velocityFromAngle(this.angle, this.move_velocity, this.body.velocity);
 
   // Check if still touching tracking object

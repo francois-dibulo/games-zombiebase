@@ -89,14 +89,11 @@ EnemyHandler.prototype = {
         if (unit.alive && unit.visible && enemy.alive) {
           var distance = Phaser.Math.distance(unit.x, unit.y, enemy.x, enemy.y);
           if (distance < enemy.view_radius) {
-            // Already following a unit
             if (!enemy.target_obj || (enemy.target_obj && enemy.target_obj.name !== "Unit")) {
               current_target = unit;
               enemy.abortClimbWall();
               enemy.stopTweenTo();
             }
-          // &&
-            //((enemy.target_obj && enemy.target_obj.device_id !== unit.device_id) || !enemy.target_obj )) {
           }
           if (distance > enemy.view_radius * 2 &&
               (enemy.target_obj && enemy.target_obj.device_id === unit.device_id)) {
