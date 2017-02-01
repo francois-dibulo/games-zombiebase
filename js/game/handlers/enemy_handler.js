@@ -53,7 +53,7 @@ EnemyHandler.prototype = {
             if (enemy.pass_wall_collide === false) {
               state = true;
             }
-          } else if (item.properties.type !== 'wall') {
+          } else {
             state = true;
           }
           return state;
