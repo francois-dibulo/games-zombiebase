@@ -58,6 +58,7 @@ Unit = function (index, game, opts) {
 
   this.inventory = [];
   this.max_inventory = 2;
+  this.collectable_items = ['item_ammo'];
 
   this.track_colliding_obj = null;
 
@@ -215,7 +216,7 @@ Unit.prototype.onVehicleLeave = function(vehicle) {
 };
 
 Unit.prototype.canCollect = function(item) {
-  return this.max_inventory >= this.inventory.length;
+  return this.max_inventory >= this.inventory.length && this.collectable_items.indexOf(item.name) > -1;
 };
 
 Unit.prototype.collectItem = function(item) {

@@ -35,6 +35,7 @@ EnemyHandler.prototype = {
 
     collide(enemies_group, enemies_group);
     collide(enemies_group, groups['tower']);
+    collide(enemies_group, groups['item']);
 
     enemies_group.forEach(function(enemy) {
 
@@ -52,6 +53,8 @@ EnemyHandler.prototype = {
             if (enemy.pass_wall_collide === false) {
               state = true;
             }
+          } else if (item.properties.type !== 'wall') {
+            state = true;
           }
           return state;
         });
@@ -59,6 +62,8 @@ EnemyHandler.prototype = {
         if (!is_touching_wall && enemy.pass_wall_collide === true) {
           enemy.leaveWall();
         }
+      } else {
+        collide(enemy, map_layer);
       }
 
       // Collides with Unit

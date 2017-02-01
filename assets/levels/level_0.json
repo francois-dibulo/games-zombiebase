@@ -95,6 +95,18 @@
                  "width":16,
                  "x":529,
                  "y":352
+                }, 
+                {
+                 "gid":6,
+                 "height":32,
+                 "id":22,
+                 "name":"generator",
+                 "rotation":0,
+                 "type":"generator",
+                 "visible":true,
+                 "width":32,
+                 "x":288,
+                 "y":384
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -103,7 +115,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":22,
+ "nextobjectid":25,
  "orientation":"orthogonal",
  "renderorder":"left-down",
  "tileheight":16,
@@ -123,7 +135,6 @@
             {
              "0":
                 {
-                 "can_climbe":true,
                  "type":"wall"
                 }
             },
@@ -131,7 +142,6 @@
             {
              "0":
                 {
-                 "can_climbe":"bool",
                  "type":"string"
                 }
             },
@@ -192,6 +202,20 @@
          "tilecount":1,
          "tileheight":16,
          "tilewidth":16,
+         "transparentcolor":"#5eff19"
+        }, 
+        {
+         "columns":1,
+         "firstgid":6,
+         "image":"..\/game\/generator.png",
+         "imageheight":32,
+         "imagewidth":32,
+         "margin":0,
+         "name":"generator",
+         "spacing":0,
+         "tilecount":1,
+         "tileheight":32,
+         "tilewidth":32,
          "transparentcolor":"#5eff19"
         }],
  "tilewidth":16,

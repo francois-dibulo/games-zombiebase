@@ -48,7 +48,8 @@ var PhaserGame = {
       'bullet',
       'bullet_big',
       'item_ammo',
-      'waypoint'
+      'waypoint',
+      'generator'
     ];
     for (var i = 0; i < images.length; i++) {
       var file = images[i];
@@ -66,7 +67,7 @@ var PhaserGame = {
     this.map.addTilesetImage('tower');
     this.map.addTilesetImage('item_ammo');
     this.map.addTilesetImage('waypoint');
-    //this.map.addTilesetImage('door_h');
+    this.map.addTilesetImage('generator');
     this.map.addTilesetImage('helicopter_landing');
 
     this.layer = this.map.createLayer('World');
@@ -129,11 +130,12 @@ var PhaserGame = {
     group.classType = Item;
     group.enableBody = true;
     // name, gid, key, frame, exists, autoCull, group, CustomClass, adjustY
-    this.map.createFromObjects('Object Layer 1', 4, 'item_ammo', 0, false, false, group, Item);
+    this.map.createFromObjects('Object Layer 1', 4, 'item_ammo', 0, true, false, group, Item);
+    this.map.createFromObjects('Object Layer 1', 6, 'generator', 0, true, false, group, Item);
     this.groups['item'] = group;
 
-    var item = group.getRandom();
-    item.exists = true;
+    //var item = group.getRandom();
+    //item.exists = true;
   },
 
   addTowerGroup: function() {
