@@ -34,6 +34,8 @@ Enemy = function (index, game, opts, async_path) {
   };
   this.attack_lock = null;
   this.attack_rate = 1000;
+  this.attack_radius = this.radius + 2;
+  this.attack_damage = 1;
 
   this.can_climbe = true;
   this.climb_wall_time = Phaser.Math.between(15, 60) * 1000;
@@ -99,6 +101,7 @@ Enemy.prototype.moveToMainTarget = function() {
 };
 
 Enemy.prototype.attack = function(obj) {
+  if (!obj.onHit) return;
   var now = new Date().getTime();
   var can_attack = now > this.attack_lock + this.attack_rate;
   if (!this.attack_lock ||

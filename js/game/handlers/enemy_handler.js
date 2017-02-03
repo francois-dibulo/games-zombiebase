@@ -66,7 +66,7 @@ EnemyHandler.prototype = {
         collide(enemy, map_layer);
       }
 
-      // Collides with Item
+      // View Collides with Item
       groups['item'].forEach(function(item) {
         if (item.alive && item.visible) {
           var distance = Phaser.Math.distance(item.x, item.y, enemy.x, enemy.y);
@@ -80,6 +80,10 @@ EnemyHandler.prototype = {
             } else {
               current_target = item;
             }
+            // Attack range
+            if (distance <= enemy.attack_radius) {
+              enemy.attack(item);
+            }
           }
         }
       });
@@ -89,13 +93,19 @@ EnemyHandler.prototype = {
         if (unit.alive && unit.visible && enemy.alive) {
           var distance = Phaser.Math.distance(unit.x, unit.y, enemy.x, enemy.y);
           if (distance < enemy.view_radius) {
-            if (!enemy.target_obj || (enemy.target_obj && enemy.target_obj.name !== "Unit")) {
+            var is_following_unit = (enemy.target_obj && enemy.target_obj.name === "Unit");
+            var new_unit_has_prio = false;
+            if (is_following_unit) {
+              new_unit_has_prio = enemy.target_obj.health > unit.health;
+              // console.log(enemy.target_obj.health, unit.health);
+            }
+            if (!enemy.target_obj || new_unit_has_prio || !is_following_unit) {
               current_target = unit;
               enemy.abortClimbWall();
               enemy.stopTweenTo();
             }
           }
-          if (distance > enemy.view_radius * 2 &&
+          if (!current_target && distance > enemy.view_radius &&
               (enemy.target_obj && enemy.target_obj.device_id === unit.device_id)) {
             current_target = enemy.main_target_obj;
           }
