@@ -59,7 +59,7 @@ Enemy.prototype.update = function() {
 
 Enemy.prototype.onHit = function(bullet) {
   this.damage(1);
-  console.log("HIT", this.health);
+  //console.log("HIT", this.health);
   return this.health === 0;
 };
 
@@ -113,14 +113,14 @@ Enemy.prototype.attack = function(obj) {
 
 Enemy.prototype.collidesWithWall = function(wall) {
   if (!this.collide_wall_timeout && (Math.abs(this.body.velocity.x) < 2 && Math.abs(this.body.velocity.y) < 2)) {
-    console.log("START TIMER", this.climb_wall_time);
+    //console.log("START TIMER", this.climb_wall_time);
     this.collide_wall_timeout = this.game.time.events.add(this.climb_wall_time, this.climbWall, this);
   }
 };
 
 Enemy.prototype.abortClimbWall = function() {
   if (this.collide_wall_timeout) {
-    console.log("ABORT TIMER");
+    //console.log("ABORT TIMER");
     this.game.time.events.add(200, function() {
       this.game.time.events.remove(this.collide_wall_timeout);
       this.collide_wall_timeout = null;
@@ -135,7 +135,7 @@ Enemy.prototype.climbWall = function() {
 };
 
 Enemy.prototype.leaveWall = function() {
-  console.log("LEAVE WALL");
+  //console.log("LEAVE WALL");
   this.abortClimbWall();
   this.pass_wall_collide = false;
   var tween = this.game.add.tween(this.scale).to({ x: 1, y: 1 }, 400, Phaser.Easing.Back.In, true, 0);

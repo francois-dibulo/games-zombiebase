@@ -14,7 +14,7 @@ EnemyHandler.prototype = {
     var group = this.getGroup();
     var enemy = group.getFirstDead();
     if (!enemy) {
-      enemy = new Enemy(group.children.length, this.phaser, {}, this.async_path);
+      enemy = new Enemy(group.children.length, this.phaser, {x: 400, y: 400}, this.async_path);
       group.add(enemy);
     } else {
       item.reset();
@@ -39,7 +39,8 @@ EnemyHandler.prototype = {
 
     enemies_group.forEach(function(enemy) {
 
-      var current_target = null;
+      var new_target = null;
+      var current_target = enemy.target_obj;
 
       // Collides with wall tile? Climb it
       if (enemy.can_climbe) {
@@ -71,14 +72,14 @@ EnemyHandler.prototype = {
         if (item.alive && item.visible) {
           var distance = Phaser.Math.distance(item.x, item.y, enemy.x, enemy.y);
           if (distance < enemy.view_radius) {
-            if (enemy.target_obj && enemy.target_obj.name) {
+            if (current_target && current_target.name) {
               var prio_item = enemy.target_prio[item.name];
-              var prio_current = enemy.target_prio[enemy.target_obj.name];
+              var prio_current = enemy.target_prio[current_target.name];
               if (prio_item < prio_current) {
-                current_target = item;
+                new_target = item;
               }
             } else {
-              current_target = item;
+              new_target = item;
             }
             // Attack range
             if (distance <= enemy.attack_radius) {
@@ -89,51 +90,75 @@ EnemyHandler.prototype = {
       });
 
       // Collides with Unit
+      var new_target_unit = null;
       units_group.forEach(function(unit) {
         if (unit.alive && unit.visible && enemy.alive) {
           var distance = Phaser.Math.distance(unit.x, unit.y, enemy.x, enemy.y);
           if (distance < enemy.view_radius) {
-            var is_following_unit = (enemy.target_obj && enemy.target_obj.name === "Unit");
-            var new_unit_has_prio = false;
-            if (is_following_unit) {
-              new_unit_has_prio = enemy.target_obj.health > unit.health;
-              // console.log(enemy.target_obj.health, unit.health);
+            if (!new_target_unit || (new_target_unit && unit.health < new_target_unit.health)) {
+              new_target_unit = unit;
             }
-            if (!enemy.target_obj || new_unit_has_prio || !is_following_unit) {
-              current_target = unit;
-              enemy.abortClimbWall();
-              enemy.stopTweenTo();
-            }
-          }
-          if (!current_target && distance > enemy.view_radius &&
-              (enemy.target_obj && enemy.target_obj.device_id === unit.device_id)) {
-            current_target = enemy.main_target_obj;
           }
         }
       }, this);
 
-      // Has no current target
-      if (enemy.main_target_obj && !enemy.target_obj) {
-        if (!current_target) {
-          //
-          var overlaps = false;
-          // Collides with main target
-          this.phaser.physics.arcade.overlap(enemy, enemy.main_target_obj, function(enemy, main_obj) {
-            overlaps = true;
-          });
-          if (overlaps) {
-            if (!enemy.overlaps_main_target) {
-              enemy.moveToMainTarget();
-            }
-            current_target = null;
-          } else {
-            current_target = enemy.main_target_obj;
-          }
-          enemy.overlaps_main_target = overlaps;
-        }
+      if (new_target_unit) {
+        new_target = new_target_unit;
+        enemy.abortClimbWall();
+        enemy.stopTweenTo();
       }
 
-      enemy.setTargetObj(current_target);
+      // else if (!new_target_unit || !new_target) {
+      //   new_target = enemy.main_target_obj;
+      // }
+
+      // Has no current target
+      if (enemy.main_target_obj && !new_target) {
+        //
+        var current_is_main = current_target ? current_target.name === enemy.main_target_obj.name : false;
+        console.log(current_target)
+        if (current_is_main) {
+          var overlaps = this.phaser.physics.arcade.overlap(enemy, enemy.main_target_obj);
+          if (overlaps && !enemy.overlaps_main_target) {
+            new_target = null;
+            enemy.moveToMainTarget();
+            enemy.overlaps_main_target = true;
+          } else if (!overlaps && enemy.overlaps_main_target) {
+            new_target = enemy.main_target_obj;
+            enemy.overlaps_main_target = false;
+          }
+          //enemy.overlaps_main_target = overlaps;
+        } else {
+          new_target = enemy.main_target_obj;
+        }
+
+
+        // var current_is_main = current_target ? current_target.name === enemy.main_target_obj.name : false;
+        // if (current_target && current_is_main) {
+        //   // Collides with main target
+
+        //   if (overlaps && !enemy.overlaps_main_target) {
+        //     enemy.moveToMainTarget();
+        //     new_target = null;
+        //     enemy.overlaps_main_target = true;
+        //   }
+
+        // } else if (!enemy.overlaps_main_target) {
+        //   new_target = enemy.main_target_obj;
+        // }
+
+        // if (!current_is_main && enemy.overlaps_main_target === true && !overlaps) {
+        //   if (current_target) {
+        //     console.log(1, current_target.name)
+        //   }
+        //   new_target = enemy.main_target_obj;
+        //   enemy.overlaps_main_target = false;
+        // }
+
+        //enemy.overlaps_main_target = overlaps;
+      }
+
+      enemy.setTargetObj(new_target);
     }, this);
 
   }

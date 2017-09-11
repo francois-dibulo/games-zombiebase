@@ -160,7 +160,7 @@ var PhaserGame = {
     this.enemy_handler = new EnemyHandler(this.phaser, this.groups, this.async_path);
     //
     var main_target = this.groups['helicopter_landing'].children[0];
-    for (var i = 0; i < 6; i++) {
+    for (var i = 0; i < 1; i++) {
       this.enemy_handler.createEnemy(main_target);
     }
   },
